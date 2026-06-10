@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador Oficial de Nombramiento Docente - Educación Física</title>
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Simulador oficial para el examen de Nombramiento Docente en Educación Física. Acceso exclusivo con credenciales, 75 preguntas y límite de 2 intentos.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Link database script -->
+  <script src="questions.js"></script>
+
+  <!-- CSS Stylesheet (Smoke White & Lilac Palette) -->
+  <style>
+    :root {
+      --bg-smoke: #F8F9FA;
+      --bg-page: #F1F3F5;
+      --card-bg: #FFFFFF;
+      --card-border: #E2E8F0;
+      --text-primary: #1E293B;
+      --text-secondary: #64748B;
+      
+      /* Accent Colors */
+      --lead-grey: #475569;
+      --lead-light: #F1F5F9;
+      --red-accent: #DC2626;
+      --red-bg: #FEF2F2;
+      --red-border: #FCA5A5;
+      
+      --green-accent: #10B981;
+      --green-bg: #ECFDF5;
+      --green-border: #A7F3D0;
+      
+      --lilac-baby: #FAF5FF;
+      --lilac-text: #8B5CF6;
+      --lilac-border: #E9D5FF;
+      
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    header {
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-badge {
+      background: linear-gradient(135deg, var(--lead-grey), var(--lilac-text));
+      color: white;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 1.2rem;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+    }
+
+    .logo-text h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      line-height: 1.1;
+    }
+
+    .logo-text span {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .env-badge {
+      font-size: 0.65rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+      border: 1px solid var(--card-border);
+    }
+    .env-local {
+      background-color: var(--lilac-baby);
+      color: var(--lilac-text);
+      border-color: var(--lilac-border);
+    }
+    .env-server {
+      background-color: var(--green-bg);
+      color: var(--green-accent);
+      border-color: var(--green-border);
+    }
+
+    .btn-icon {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-secondary);
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+
+    .btn-icon:hover {
+      border-color: var(--lilac-text);
+      color: var(--lilac-text);
+      transform: translateY(-1px);
+    }
+
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 10px 24px 80px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    /* Professional Card style */
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 36px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Auth panel */
+    .auth-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .auth-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--lead-grey);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-control {
+      width: 100%;
+      background-color: var(--bg-smoke);
+      border: 1px solid var(--card-border);
+      padding: 12px 14px;
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--lilac-text);
+      background-color: white;
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+    }
+
+    .error-alert {
+      background-color: var(--red-bg);
+      border: 1px solid var(--red-border);
+      color: var(--red-accent);
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      margin-bottom: 20px;
+      display: none;
+      font-weight: 500;
+    }
+
+    .demo-credentials {
+      margin-top: 20px;
+      background-color: var(--lilac-baby);
+      border: 1px dashed var(--lilac-border);
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      color: var(--lilac-text);
+      text-align: left;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background-color: var(--lead-grey);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn:hover {
+      background-color: #334155;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background-color: var(--lilac-text);
+    }
+    .btn-primary:hover {
+      background-color: #7C3AED;
+    }
+
+    .btn-logout {
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--text-secondary);
+      font-size: 0.75rem;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 24px;
+      transition: all 0.2s ease;
+    }
+    .btn-logout:hover {
+      color: var(--red-accent);
+      border-color: var(--red-border);
+    }
+
+    /* Progress bar */
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+
+    .quiz-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .meta-badge {
+      background-color: var(--bg-smoke);
+      padding: 5px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 6px;
+      background-color: var(--lead-light);
+      border-radius: 10px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--green-accent), var(--lilac-text));
+      width: 0%;
+      border-radius: 10px;
+      transition: width 0.3s ease;
+    }
+
+    /* Categories & text */
+    .subprueba-badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 4px;
+      background-color: var(--lilac-baby);
+      color: var(--lilac-text);
+      margin-bottom: 8px;
+      border: 1px solid var(--lilac-border);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .question-category {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    .question-text {
+      font-size: 1.05rem;
+      font-weight: 600;
+      line-height: 1.5;
+      margin-bottom: 24px;
+      color: var(--text-primary);
+      white-space: pre-line;
+    }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .option-button {
+      background-color: white;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      text-align: left;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      color: var(--text-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      transition: all 0.2s ease;
+    }
+
+    .option-letter {
+      background-color: var(--bg-smoke);
+      border: 1px solid var(--card-border);
+      color: var(--text-secondary);
+      font-weight: 700;
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 0.8rem;
+    }
+
+    .option-button:hover:not(.disabled) {
+      background-color: var(--bg-smoke);
+      border-color: var(--lilac-text);
+    }
+    .option-button:hover:not(.disabled) .option-letter {
+      background-color: var(--lilac-text);
+      color: white;
+    }
+
+    .option-button.correct {
+      background-color: var(--green-bg);
+      border-color: var(--green-accent);
+    }
+    .option-button.correct .option-letter {
+      background-color: var(--green-accent);
+      color: white;
+    }
+
+    .option-button.incorrect {
+      background-color: var(--red-bg);
+      border-color: var(--red-accent);
+    }
+    .option-button.incorrect .option-letter {
+      background-color: var(--red-accent);
+      color: white;
+    }
+
+    .option-button.disabled {
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+    .option-button.disabled:not(.correct):not(.incorrect) {
+      opacity: 0.45;
+    }
+
+    /* Feedback */
+    .feedback-box {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.3s ease, opacity 0.3s ease;
+    }
+    .feedback-box.visible {
+      max-height: 400px;
+      opacity: 1;
+      margin-bottom: 24px;
+    }
+
+    .feedback-content {
+      border: 1px solid var(--card-border);
+      padding: 18px;
+      border-radius: 10px;
+      background-color: var(--bg-smoke);
+    }
+
+    .feedback-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .feedback-title.correct { color: var(--green-accent); }
+    .feedback-title.incorrect { color: var(--red-accent); }
+
+    .feedback-explanation {
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: var(--text-secondary);
+    }
+
+    /* Results */
+    .results-view {
+      text-align: center;
+    }
+
+    .score-gauge {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      margin: 0 auto 20px auto;
+    }
+
+    .score-svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .gauge-bg {
+      fill: none;
+      stroke: var(--lead-light);
+      stroke-width: 8;
+    }
+
+    .gauge-fill {
+      fill: none;
+      stroke: url(#gaugeGradient);
+      stroke-width: 8;
+      stroke-dasharray: 440;
+      stroke-dashoffset: 440;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 1s ease;
+    }
+
+    .score-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+    }
+
+    .score-subtext {
+      font-size: 0.7rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      display: block;
+    }
+
+    .result-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      border: 1px solid var(--card-border);
+    }
+    .result-badge.badge-success {
+      background-color: var(--green-bg);
+      color: var(--green-accent);
+    }
+    .result-badge.badge-danger {
+      background-color: var(--red-bg);
+      color: var(--red-accent);
+    }
+
+    .result-headline {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .result-desc {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    .diagnostic-panel {
+      text-align: left;
+      background-color: var(--bg-smoke);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+
+    .diagnostic-panel h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .diag-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--card-border);
+      font-size: 0.8rem;
+    }
+    .diag-item:last-child {
+      border-bottom: none;
+    }
+    .diag-val {
+      font-weight: 600;
+    }
+
+    .review-accordion-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-align: left;
+      margin-bottom: 12px;
+      margin-top: 30px;
+    }
+
+    .review-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-align: left;
+      margin-bottom: 24px;
+    }
+
+    .review-item {
+      background-color: var(--bg-smoke);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .review-q-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+
+    .review-q-num {
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: var(--lilac-text);
+    }
+
+    .review-status {
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .review-status.correct { color: var(--green-accent); }
+    .review-status.incorrect { color: var(--red-accent); }
+
+    .review-q-text {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      white-space: pre-line;
+    }
+
+    .review-answer-row {
+      font-size: 0.75rem;
+      margin-bottom: 4px;
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="confetti-canvas"></canvas>
+
+  <header>
+    <div class="logo-container">
+      <div class="logo-badge">EF</div>
+      <div class="logo-text">
+        <h1>Simulacro Docente</h1>
+        <span>Evaluación Nacional Oficial</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <span class="env-badge env-local" id="environment-badge">Modo Local</span>
+      <button class="btn-icon" id="sound-toggle" aria-label="Alternar Sonido" title="Alternar Sonido">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- LOGIN VIEW -->
+    <div class="card" id="auth-card" style="display: block;">
+      <h2 class="auth-title">Ingreso al Simulador</h2>
+      <p class="auth-subtitle">Introduce tus credenciales de acceso asignadas por el administrador.</p>
+      
+      <div class="error-alert" id="auth-error"></div>
+
+      <div class="form-group">
+        <label for="auth-username">Usuario / Código</label>
+        <input type="text" id="auth-username" class="form-control" placeholder="Ej: COD-7291">
+      </div>
+      <div class="form-group">
+        <label for="auth-password">Contraseña</label>
+        <input type="password" id="auth-password" class="form-control" placeholder="••••••••">
+      </div>
+
+      <div class="auth-actions">
+        <button class="btn btn-primary" id="auth-primary-btn" style="width: 100%;">Acceder a la Evaluación</button>
+      </div>
+
+      <div class="demo-credentials" id="demo-credentials-box" style="display: none;">
+        <strong>🔑 Credenciales de demostración en Modo Local:</strong><br>
+        • Usuario: <code>DOCENTE_DEMO</code> | Contraseña: <code>123</code><br>
+        • Usuario: <code>DOCENTE_TEST</code> | Contraseña: <code>abc</code>
+      </div>
+    </div>
+
+    <!-- WELCOME VIEW -->
+    <div class="card welcome-view" id="welcome-card" style="display: none;">
+      <div class="welcome-icon">🎓</div>
+      <h2 class="welcome-title">Bienvenido, <span id="welcome-username">Docente</span></h2>
+      <p class="welcome-desc">
+        Estás por iniciar el simulacro de la Prueba Nacional completa de **75 preguntas** (Especialidad Educación Física y Habilidades Generales).
+      </p>
+
+      <div class="config-panel" style="text-align: left; line-height: 1.5; font-size: 0.9rem; color: var(--text-secondary);">
+        <h3 style="color: var(--text-primary); font-size: 0.95rem; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+          📋 Reglas del Simulacro:
+        </h3>
+        <p>• <strong>Tiempo Límite:</strong> 2 Horas exactas.</p>
+        <p>• <strong>Intentos Máximos:</strong> 2 Intentos permitidos por usuario.</p>
+        <p>• <strong>Aprobación:</strong> Mínimo 84 puntos en la subprueba de especialidad.</p>
+        <p>• <strong>Ponderación:</strong> Especialidad (3 pts c/u), Generales (2 pts c/u).</p>
+      </div>
+
+      <div id="start-actions-container">
+        <button class="btn btn-primary" id="start-btn">Comenzar Intento</button>
+      </div>
+
+      <div class="history-section" id="history-section" style="display: none;">
+        <h3 class="history-title">📚 Tus Intentos</h3>
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Puntaje</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="history-table-body"></tbody>
+        </table>
+      </div>
+
+      <button class="btn-logout" id="logout-btn">Cerrar Sesión</button>
+    </div>
+
+    <!-- QUIZ VIEW -->
+    <div class="card" id="quiz-card" style="display: none;">
+      <div class="quiz-header">
+        <span id="question-progress">Pregunta 1 de 75</span>
+        <div class="quiz-meta">
+          <div class="meta-badge" id="timer-badge">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span id="time-display">02:00:00</span>
+          </div>
+          <div class="meta-badge" id="score-badge">
+            <span style="color: var(--green-accent);">Pts:</span>
+            <span id="score-display">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="progress-bar-fill"></div>
+      </div>
+
+      <div class="subprueba-badge" id="subprueba-badge">Especialidad</div>
+      <div class="question-category" id="question-category">Didáctica</div>
+      <div class="question-text" id="question-text">Cargando...</div>
+
+      <div class="options-list" id="options-list"></div>
+
+      <div class="feedback-box" id="feedback-box">
+        <div class="feedback-content">
+          <div class="feedback-title" id="feedback-title"></div>
+          <p class="feedback-explanation" id="feedback-explanation">Justificación...</p>
+        </div>
+      </div>
+
+      <div class="quiz-actions">
+        <button class="btn btn-primary" id="next-btn" style="display: none;">
+          Siguiente Pregunta
+        </button>
+      </div>
+    </div>
+
+    <!-- RESULTS VIEW -->
+    <div class="card results-view" id="results-card" style="display: none;">
+      <div class="score-gauge">
+        <svg class="score-svg" viewBox="0 0 160 160">
+          <defs>
+            <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="var(--green-accent)" />
+              <stop offset="100%" stop-color="var(--lilac-text)" />
+            </linearGradient>
+          </defs>
+          <circle class="gauge-bg" cx="80" cy="80" r="70"></circle>
+          <circle class="gauge-fill" id="gauge-fill" cx="80" cy="80" r="70"></circle>
+        </svg>
+        <div class="score-text">
+          <span id="final-score-txt">0</span>
+          <span class="score-subtext" id="final-score-total">/ 200 pts</span>
+        </div>
+      </div>
+
+      <div class="result-badge" id="result-badge">Resultado</div>
+      <h3 class="result-headline" id="result-headline">Diagnóstico</h3>
+      <p class="result-desc" id="result-desc">Resumen...</p>
+
+      <div class="diagnostic-panel">
+        <h4>📊 Diagnóstico de la Prueba Nacional</h4>
+        <div class="diag-item">
+          <span>Tiempo empleado:</span>
+          <span class="diag-val" id="diag-time">00:00</span>
+        </div>
+        <div class="diag-item">
+          <span>Subprueba Especialidad (Mín. 84 requerido):</span>
+          <span class="diag-val" id="diag-val-ped">0 / 150 pts</span>
+        </div>
+        <div class="diag-item">
+          <span>Subprueba Habilidades Generales:</span>
+          <span class="diag-val" id="diag-val-gen">0 / 50 pts</span>
+        </div>
+        <div class="diag-item">
+          <span>Puntaje Total Obtenido:</span>
+          <span class="diag-val" id="diag-val-total">0 / 200 pts</span>
+        </div>
+        <div class="diag-item">
+          <span>Estado en Carrera Magisterial:</span>
+          <span class="diag-val" id="diag-status" style="font-weight: 800;">REPROBADO</span>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+        <button class="btn btn-primary" id="finish-review-btn">Volver al Panel</button>
+      </div>
+
+      <h3 class="review-accordion-title">🔍 Detalle de Respuestas</h3>
+      <div class="review-list" id="review-list"></div>
+    </div>
+  </main>
+
+  <script>
+    // Audio Synthesizer Class (Web Audio API)
+    class AudioSynthesizer {
+      constructor() {
+        this.enabled = true;
+        this.audioCtx = null;
+      }
+
+      initContext() {
+        if (!this.audioCtx) {
+          this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (this.audioCtx.state === 'suspended') {
+          this.audioCtx.resume();
+        }
+      }
+
+      playCorrect() {
+        if (!this.enabled) return;
+        this.initContext();
+        const osc = this.audioCtx.createOscillator();
+        const gain = this.audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(this.audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(523.25, this.audioCtx.currentTime); // C5
+        osc.frequency.exponentialRampToValueAtTime(783.99, this.audioCtx.currentTime + 0.15); // G5
+        gain.gain.setValueAtTime(0.1, this.audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.audioCtx.currentTime + 0.3);
+        osc.start();
+        osc.stop(this.audioCtx.currentTime + 0.3);
+      }
+
+      playIncorrect() {
+        if (!this.enabled) return;
+        this.initContext();
+        const osc = this.audioCtx.createOscillator();
+        const gain = this.audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(this.audioCtx.destination);
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, this.audioCtx.currentTime); // A3
+        osc.frequency.linearRampToValueAtTime(147, this.audioCtx.currentTime + 0.25); // D3
+        gain.gain.setValueAtTime(0.08, this.audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.audioCtx.currentTime + 0.3);
+        osc.start();
+        osc.stop(this.audioCtx.currentTime + 0.3);
+      }
+
+      playClick() {
+        if (!this.enabled) return;
+        this.initContext();
+        const osc = this.audioCtx.createOscillator();
+        const gain = this.audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(this.audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(600, this.audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.05, this.audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.audioCtx.currentTime + 0.05);
+        osc.start();
+        osc.stop(this.audioCtx.currentTime + 0.05);
+      }
+    }
+
+    // Dynamic environment API endpoints & Fallback
+    const API_BASE = window.location.origin.includes('file://') ? null : window.location.origin;
+    let currentUser = null;
+    let currentAttempt = null;
+    let isOfflineMode = false;
+
+    // Local DB Simulation for Offline mode
+    const simulatedDB = {
+      users: JSON.parse(localStorage.getItem('sim_users')) || [
+        { id: 'sim_usr_1', username: 'DOCENTE_DEMO', password: '123', attemptsUsed: 0 },
+        { id: 'sim_usr_2', username: 'DOCENTE_TEST', password: 'abc', attemptsUsed: 0 }
+      ],
+      attempts: JSON.parse(localStorage.getItem('sim_attempts')) || []
+    };
+
+    function saveSimulatedDB() {
+      localStorage.setItem('sim_users', JSON.stringify(simulatedDB.users));
+      localStorage.setItem('sim_attempts', JSON.stringify(simulatedDB.attempts));
+    }
+
+    // Render environment status badge
+    const environmentBadge = document.getElementById('environment-badge');
+    const demoCredentialsBox = document.getElementById('demo-credentials-box');
+    if (API_BASE) {
+      environmentBadge.innerText = "Modo Servidor";
+      environmentBadge.className = "env-badge env-server";
+      isOfflineMode = false;
+      demoCredentialsBox.style.display = 'none';
+    } else {
+      environmentBadge.innerText = "Modo Local (Simulado)";
+      environmentBadge.className = "env-badge env-local";
+      isOfflineMode = true;
+      demoCredentialsBox.style.display = 'block';
+    }
+
+    // State Variables
+    let activeQuestions = [...examQuestions]; // Focuses exactly on the 75 questions
+    let currentQuestionIdx = 0;
+    let scoreGenerales = 0;
+    let scorePedagogicos = 0;
+    let totalScore = 0;
+    let answered = false;
+    let selectedOptionIdx = null;
+    let userAnswers = [];
+    let timeLimitMs = 2 * 60 * 60 * 1000; // Strictly 2 hours
+    let timerInterval = null;
+    let startTime = null;
+
+    const audio = new AudioSynthesizer();
+
+    // DOM selectors
+    const authCard = document.getElementById('auth-card');
+    const welcomeCard = document.getElementById('welcome-card');
+    const quizCard = document.getElementById('quiz-card');
+    const resultsCard = document.getElementById('results-card');
+
+    const authUsernameInput = document.getElementById('auth-username');
+    const authPasswordInput = document.getElementById('auth-password');
+    const authPrimaryBtn = document.getElementById('auth-primary-btn');
+    const authError = document.getElementById('auth-error');
+
+    const welcomeUsername = document.getElementById('welcome-username');
+    const startActionsContainer = document.getElementById('start-actions-container');
+    const historySection = document.getElementById('history-section');
+    const historyTableBody = document.getElementById('history-table-body');
+    const logoutBtn = document.getElementById('logout-btn');
+    const startBtn = document.getElementById('start-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const finishReviewBtn = document.getElementById('finish-review-btn');
+
+    const questionProgress = document.getElementById('question-progress');
+    const progressFill = document.getElementById('progress-bar-fill');
+    const subpruebaBadge = document.getElementById('subprueba-badge');
+    const questionCategory = document.getElementById('question-category');
+    const questionText = document.getElementById('question-text');
+    const optionsList = document.getElementById('options-list');
+    const scoreDisplay = document.getElementById('score-display');
+    const timeDisplay = document.getElementById('time-display');
+
+    const feedbackBox = document.getElementById('feedback-box');
+    const feedbackTitle = document.getElementById('feedback-title');
+    const feedbackExplanation = document.getElementById('feedback-explanation');
+
+    const finalScoreTxt = document.getElementById('final-score-txt');
+    const finalScoreTotal = document.getElementById('final-score-total');
+    const gaugeFill = document.getElementById('gauge-fill');
+    const resultBadge = document.getElementById('result-badge');
+    const resultHeadline = document.getElementById('result-headline');
+    const resultDesc = document.getElementById('result-desc');
+    
+    const diagTime = document.getElementById('diag-time');
+    const diagValPed = document.getElementById('diag-val-ped');
+    const diagValGen = document.getElementById('diag-val-gen');
+    const diagValTotal = document.getElementById('diag-val-total');
+    const diagStatus = document.getElementById('diag-status');
+    const reviewList = document.getElementById('review-list');
+
+    const soundToggle = document.getElementById('sound-toggle');
+
+    // Confetti Canvas setup
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    let confetti = [];
+    let confettiAnimationId = null;
+
+    // Sound Toggle Handler
+    soundToggle.addEventListener('click', () => {
+      audio.enabled = !audio.enabled;
+      soundToggle.style.opacity = audio.enabled ? "1" : "0.5";
+      soundToggle.innerHTML = audio.enabled
+        ? `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`
+        : `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`;
+      audio.playClick();
+    });
+
+    // API consumer with Simulated Local fallback
+    async function apiRequest(endpoint, method, body) {
+      if (isOfflineMode) {
+        return handleSimulatedRequest(endpoint, method, body);
+      }
+
+      try {
+        const response = await fetch(`${API_BASE}${endpoint}`, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Algo salió mal');
+        return data;
+      } catch (err) {
+        console.warn("Conexión al servidor fallida. Cambiando a Modo Local Simulado.");
+        isOfflineMode = true;
+        environmentBadge.innerText = "Modo Local (Simulado)";
+        environmentBadge.className = "env-badge env-local";
+        demoCredentialsBox.style.display = 'block';
+        return handleSimulatedRequest(endpoint, method, body);
+      }
+    }
+
+    // Simulated local router
+    function handleSimulatedRequest(endpoint, method, body) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          if (endpoint === '/api/login') {
+            const user = simulatedDB.users.find(u => u.username.toUpperCase() === body.username.trim().toUpperCase() && u.password === body.password);
+            if (!user) return reject(new Error('Credenciales inválidas o usuario no registrado'));
+            
+            const attempts = simulatedDB.attempts.filter(a => a.userId === user.id);
+            const activeAttempt = attempts.find(a => a.status === 'in_progress');
+
+            resolve({
+              userId: user.id,
+              username: user.username,
+              attemptsUsed: user.attemptsUsed,
+              activeAttempt: activeAttempt ? {
+                id: activeAttempt.id,
+                startTime: activeAttempt.startTime,
+                timeLimitMs: 2 * 60 * 60 * 1000,
+                elapsedMs: Date.now() - activeAttempt.startTime
+              } : null
+            });
+          }
+
+          else if (endpoint === '/api/start') {
+            const user = simulatedDB.users.find(u => u.id === body.userId);
+            if (!user) return reject(new Error('Usuario no encontrado'));
+
+            const userAttempts = simulatedDB.attempts.filter(a => a.userId === body.userId);
+            const finishedAttempts = userAttempts.filter(a => a.status !== 'in_progress');
+
+            if (finishedAttempts.length >= 2) {
+              return reject(new Error('Ya has agotado tus 2 intentos máximos permitidos'));
+            }
+
+            let activeAttempt = userAttempts.find(a => a.status === 'in_progress');
+            if (activeAttempt) {
+              const elapsed = Date.now() - activeAttempt.startTime;
+              if (elapsed > 2 * 60 * 60 * 1000) {
+                activeAttempt.status = 'expired';
+                activeAttempt.endTime = activeAttempt.startTime + (2 * 60 * 60 * 1000);
+                user.attemptsUsed = finishedAttempts.length + 1;
+                saveSimulatedDB();
+                if (user.attemptsUsed >= 2) {
+                  return reject(new Error('Tu intento activo expiró por tiempo límite. Has agotado tus 2 intentos máximos.'));
+                }
+                activeAttempt = null;
+              } else {
+                return resolve({
+                  message: 'Resumiendo intento activo',
+                  attemptId: activeAttempt.id,
+                  startTime: activeAttempt.startTime,
+                  elapsedMs: elapsed,
+                  timeLimitMs: 2 * 60 * 60 * 1000
+                });
+              }
+            }
+
+            const newAttempt = {
+              id: 'sim_att_' + Math.random().toString(36).substr(2, 9),
+              userId: body.userId,
+              startTime: Date.now(),
+              endTime: null,
+              score: null,
+              status: 'in_progress'
+            };
+
+            simulatedDB.attempts.push(newAttempt);
+            user.attemptsUsed = finishedAttempts.length + 1;
+            saveSimulatedDB();
+
+            resolve({
+              message: 'Intento iniciado correctamente',
+              attemptId: newAttempt.id,
+              startTime: newAttempt.startTime,
+              elapsedMs: 0,
+              timeLimitMs: 2 * 60 * 60 * 1000
+            });
+          }
+
+          else if (endpoint === '/api/submit') {
+            const attempt = simulatedDB.attempts.find(a => a.id === body.attemptId && a.userId === body.userId);
+            if (!attempt) return reject(new Error('Intento no encontrado'));
+            if (attempt.status !== 'in_progress') return reject(new Error('Este intento ya ha sido calificado'));
+
+            attempt.status = 'completed';
+            attempt.endTime = Date.now();
+            attempt.score = body.score;
+            attempt.answers = body.answers;
+
+            const user = simulatedDB.users.find(u => u.id === body.userId);
+            if (user) {
+              const finishedCount = simulatedDB.attempts.filter(a => a.userId === body.userId && a.status !== 'in_progress').length;
+              user.attemptsUsed = finishedCount;
+            }
+            saveSimulatedDB();
+
+            resolve({
+              message: 'Examen enviado y calificado con éxito',
+              score: body.score,
+              attemptsUsed: user ? user.attemptsUsed : 0
+            });
+          }
+
+          else if (endpoint.startsWith('/api/status/')) {
+            const userId = endpoint.split('/')[3];
+            const user = simulatedDB.users.find(u => u.id === userId);
+            if (!user) return reject(new Error('Usuario no encontrado'));
+
+            const attempts = simulatedDB.attempts.filter(a => a.userId === userId);
+            const finishedAttempts = attempts.filter(a => a.status !== 'in_progress');
+            const activeAttempt = attempts.find(a => a.status === 'in_progress');
+
+            resolve({
+              username: user.username,
+              attemptsUsed: finishedAttempts.length,
+              activeAttempt: activeAttempt ? {
+                id: activeAttempt.id,
+                startTime: activeAttempt.startTime,
+                elapsedMs: Date.now() - activeAttempt.startTime,
+                timeLimitMs: 2 * 60 * 60 * 1000
+              } : null,
+              history: finishedAttempts.map(a => ({
+                id: a.id,
+                score: a.score,
+                date: new Date(a.endTime).toLocaleString(),
+                status: a.status
+              }))
+            });
+          }
+        }, 150);
+      });
+    }
+
+    // LOGIN ACTION
+    authPrimaryBtn.addEventListener('click', async () => {
+      audio.playClick();
+      const username = authUsernameInput.value.trim();
+      const password = authPasswordInput.value.trim();
+
+      if (!username || !password) {
+        showAuthError("Por favor completa todos los campos");
+        return;
+      }
+
+      authError.style.display = 'none';
+
+      try {
+        const loginData = await apiRequest('/api/login', 'POST', { username, password });
+        currentUser = {
+          id: loginData.userId,
+          username: loginData.username
+        };
+
+        localStorage.setItem('docente_userId_sub', currentUser.id);
+        authCard.style.display = 'none';
+        welcomeCard.style.display = 'block';
+        loadDashboard();
+      } catch (err) {
+        showAuthError(err.message);
+      }
+    });
+
+    function showAuthError(msg) {
+      authError.innerText = msg;
+      authError.style.display = 'block';
+      audio.playIncorrect();
+    }
+
+    // Auto-login verify
+    const savedUserId = localStorage.getItem('docente_userId_sub');
+    if (savedUserId) {
+      currentUser = { id: savedUserId };
+      authCard.style.display = 'none';
+      welcomeCard.style.display = 'block';
+      loadDashboard();
+    }
+
+    logoutBtn.addEventListener('click', () => {
+      audio.playClick();
+      localStorage.removeItem('docente_userId_sub');
+      currentUser = null;
+      welcomeCard.style.display = 'none';
+      authCard.style.display = 'block';
+      stopConfetti();
+    });
+
+    // DASHBOARD AND HISTORIC LOADER
+    async function loadDashboard() {
+      try {
+        const status = await apiRequest(`/api/status/${currentUser.id}`, 'GET');
+        welcomeUsername.innerText = status.username;
+
+        startActionsContainer.innerHTML = '';
+        
+        if (status.activeAttempt) {
+          currentAttempt = status.activeAttempt;
+          startActionsContainer.innerHTML = `
+            <button class="btn btn-primary" id="resume-btn" style="background-color: var(--lilac-text);">
+              Reanudar Intento Activo
+            </button>
+          `;
+          document.getElementById('resume-btn').addEventListener('click', () => {
+            audio.playClick();
+            startExam(true);
+          });
+        } else if (status.attemptsUsed >= 2) {
+          startActionsContainer.innerHTML = `
+            <div class="result-badge badge-danger" style="display:block; padding: 12px; margin-bottom: 0;">
+              🚫 Has agotado tus 2 intentos permitidos. No puedes iniciar un nuevo examen.
+            </div>
+          `;
+        } else {
+          startActionsContainer.innerHTML = `
+            <button class="btn btn-primary" id="start-btn-dashboard">
+              Comenzar Intento (${2 - status.attemptsUsed} disponible/s)
+            </button>
+          `;
+          document.getElementById('start-btn-dashboard').addEventListener('click', () => {
+            audio.playClick();
+            startExam(false);
+          });
+        }
+
+        // Render history
+        if (status.history && status.history.length > 0) {
+          historySection.style.display = 'block';
+          historyTableBody.innerHTML = '';
+          status.history.forEach(hist => {
+            const tr = document.createElement('tr');
+            let scoreStr = hist.score !== null ? `${hist.score} pts` : 'N/A';
+            tr.innerHTML = `
+              <td>${hist.date}</td>
+              <td style="font-weight: 700; color: var(--lilac-text);">${scoreStr}</td>
+              <td><span class="review-status ${hist.status === 'completed' ? 'correct' : 'incorrect'}">${hist.status.toUpperCase()}</span></td>
+            `;
+            historyTableBody.appendChild(tr);
+          });
+        } else {
+          historySection.style.display = 'none';
+        }
+      } catch (err) {
+        console.error("Error cargando dashboard:", err);
+      }
+    }
+
+    // EXAM TIMERS AND LOGIC
+    async function startExam(isResuming) {
+      try {
+        const session = await apiRequest('/api/start', 'POST', {
+          userId: currentUser.id
+        });
+
+        currentAttempt = session;
+        activeQuestions = [...examQuestions];
+
+        currentQuestionIdx = 0;
+        scoreGenerales = 0;
+        scorePedagogicos = 0;
+        totalScore = 0;
+        userAnswers = [];
+        scoreDisplay.innerText = 0;
+
+        startTime = Date.now() - session.elapsedMs;
+        timeLimitMs = session.timeLimitMs;
+
+        if (timerInterval) clearInterval(timerInterval);
+        updateCountdown();
+        timerInterval = setInterval(updateCountdown, 1000);
+
+        welcomeCard.style.display = 'none';
+        quizCard.style.display = 'block';
+
+        loadQuestion(0);
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    function updateCountdown() {
+      const elapsed = Date.now() - startTime;
+      const remaining = timeLimitMs - elapsed;
+
+      if (remaining <= 0) {
+        clearInterval(timerInterval);
+        timeDisplay.innerText = "00:00:00";
+        alert("¡El tiempo límite oficial de 2 horas ha terminado! Se enviará tu examen automáticamente.");
+        finishExam();
+        return;
+      }
+
+      const totalSec = Math.floor(remaining / 1000);
+      const hours = Math.floor(totalSec / 3600).toString().padStart(2, '0');
+      const min = Math.floor((totalSec % 3600) / 60).toString().padStart(2, '0');
+      const sec = (totalSec % 60).toString().padStart(2, '0');
+      timeDisplay.innerText = `${hours}:${min}:${sec}`;
+    }
+
+    function loadQuestion(idx) {
+      answered = false;
+      selectedOptionIdx = null;
+
+      const q = activeQuestions[idx];
+
+      questionProgress.innerText = `Pregunta ${idx + 1} de ${activeQuestions.length}`;
+      
+      if (q.subprueba === 'generales') {
+        subpruebaBadge.innerText = "Subprueba: Habilidades Generales (2 Pts)";
+        subpruebaBadge.style.color = "var(--lilac-text)";
+        subpruebaBadge.style.backgroundColor = "var(--lilac-baby)";
+        subpruebaBadge.style.borderColor = "var(--lilac-border)";
+      } else {
+        subpruebaBadge.innerText = "Subprueba: Conocimientos de Especialidad (3 Pts)";
+        subpruebaBadge.style.color = "var(--green-accent)";
+        subpruebaBadge.style.backgroundColor = "var(--green-bg)";
+        subpruebaBadge.style.borderColor = "var(--green-border)";
+      }
+
+      questionCategory.innerText = q.category;
+      questionText.innerText = q.question;
+
+      const percent = (idx / activeQuestions.length) * 100;
+      progressFill.style.width = `${percent}%`;
+
+      nextBtn.style.display = 'none';
+      feedbackBox.classList.remove('visible');
+
+      optionsList.innerHTML = '';
+      q.options.forEach((opt, optIdx) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-button';
+        btn.innerHTML = `
+          <div class="option-letter">${opt.letter}</div>
+          <div style="flex: 1;">${opt.text}</div>
+        `;
+        btn.addEventListener('click', () => selectOption(optIdx));
+        optionsList.appendChild(btn);
+      });
+    }
+
+    function selectOption(optIdx) {
+      if (answered) return;
+      answered = true;
+      selectedOptionIdx = optIdx;
+
+      const q = activeQuestions[currentQuestionIdx];
+      const opt = q.options[optIdx];
+      const isCorrect = opt.correct;
+
+      let pts = 0;
+      if (isCorrect) {
+        pts = q.subprueba === 'generales' ? 2 : 3;
+        if (q.subprueba === 'generales') {
+          scoreGenerales += 2;
+        } else {
+          scorePedagogicos += 3;
+        }
+        totalScore += pts;
+        scoreDisplay.innerText = totalScore;
+        audio.playCorrect();
+      } else {
+        audio.playIncorrect();
+      }
+
+      userAnswers.push({
+        questionIdx: currentQuestionIdx,
+        selectedIdx: optIdx,
+        correctIdx: q.options.findIndex(o => o.correct),
+        pointsGained: isCorrect ? pts : 0
+      });
+
+      const buttons = optionsList.getElementsByClassName('option-button');
+      Array.from(buttons).forEach((btn, index) => {
+        btn.classList.add('disabled');
+        if (index === optIdx) {
+          btn.classList.add(isCorrect ? 'correct' : 'incorrect');
+        } else if (q.options[index].correct) {
+          btn.classList.add('correct');
+        }
+      });
+
+      feedbackBox.classList.add('visible');
+      if (isCorrect) {
+        feedbackTitle.className = "feedback-title correct";
+        feedbackTitle.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          ¡Respuesta Correcta! (+${pts} pts)
+        `;
+      } else {
+        feedbackTitle.className = "feedback-title incorrect";
+        feedbackTitle.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          Justificación Técnica:
+        `;
+      }
+      feedbackExplanation.innerText = opt.explanation;
+
+      nextBtn.style.display = 'inline-flex';
+
+      const percent = ((currentQuestionIdx + 1) / activeQuestions.length) * 100;
+      progressFill.style.width = `${percent}%`;
+    }
+
+    async function finishExam() {
+      if (timerInterval) clearInterval(timerInterval);
+      
+      try {
+        await apiRequest('/api/submit', 'POST', {
+          userId: currentUser.id,
+          attemptId: currentAttempt.attemptId,
+          score: totalScore,
+          answers: userAnswers
+        });
+      } catch (err) {
+        console.error("Error enviando respuestas:", err);
+      }
+
+      quizCard.style.display = 'none';
+      resultsCard.style.display = 'block';
+
+      const elapsedMs = Date.now() - startTime;
+      const totalSeconds = Math.floor(elapsedMs / 1000);
+      const hours = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+      const min = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+      const sec = (totalSeconds % 60).toString().padStart(2, '0');
+      diagTime.innerText = `${hours}:${min}:${sec}`;
+
+      diagValPed.innerText = `${scorePedagogicos} / 150 pts`;
+      diagValGen.innerText = `${scoreGenerales} / 50 pts`;
+      diagValTotal.innerText = `${totalScore} / 200 pts`;
+
+      finalScoreTxt.innerText = totalScore;
+      finalScoreTotal.innerText = `/ 200 pts`;
+
+      const perimeter = 440;
+      const offset = perimeter - (perimeter * totalScore) / 200;
+      gaugeFill.style.strokeDashoffset = offset;
+
+      const approved = scorePedagogicos >= 84;
+      if (approved) {
+        diagStatus.innerText = "¡APROBADO NACIONAL! 🎉";
+        diagStatus.style.color = "var(--green-accent)";
+        resultBadge.className = "result-badge badge-success";
+        resultBadge.innerText = "Aprobado";
+        resultHeadline.innerText = "¡Excelente preparación!";
+        resultDesc.innerText = "Has superado el puntaje mínimo de especialidad (84 pts) requerido por el MINEDU y estás calificado para avanzar a la etapa descentralizada.";
+        startConfetti();
+      } else {
+        diagStatus.innerText = "REPROBADO ❌";
+        diagStatus.style.color = "var(--red-accent)";
+        resultBadge.className = "result-badge badge-danger";
+        resultBadge.innerText = "Reprobado";
+        resultHeadline.innerText = "Sigue Repasando";
+        resultDesc.innerText = `No has alcanzado los 84 puntos mínimos exigidos en la subprueba de Conocimientos Especializados (Obtuviste: ${scorePedagogicos} pts).`;
+      }
+
+      buildReviewAccordion();
+    }
+
+    finishReviewBtn.addEventListener('click', () => {
+      audio.playClick();
+      resultsCard.style.display = 'none';
+      welcomeCard.style.display = 'block';
+      stopConfetti();
+      loadDashboard();
+    });
+
+    function buildReviewAccordion() {
+      reviewList.innerHTML = '';
+      activeQuestions.forEach((q, idx) => {
+        const uAns = userAnswers.find(ua => ua.questionIdx === idx);
+        const selectedOpt = q.options[uAns.selectedIdx];
+        const correctOpt = q.options[uAns.correctIdx];
+        const isCorrect = selectedOpt.correct;
+
+        const item = document.createElement('div');
+        item.className = 'review-item';
+        item.innerHTML = `
+          <div class="review-q-header">
+            <span class="review-q-num">Pregunta ${idx + 1} (${q.category})</span>
+            <span class="review-status ${isCorrect ? 'correct' : 'incorrect'}">
+              ${isCorrect ? '✓ Correcta' : '✗ Incorrecta'}
+            </span>
+          </div>
+          <div class="review-q-text">${q.question}</div>
+          <div class="review-answer-row">Tu respuesta: <strong>(${selectedOpt.letter}) ${selectedOpt.text}</strong></div>
+          ${!isCorrect ? `<div class="review-answer-row" style="color: var(--green-accent)">Correcta: <strong>(${correctOpt.letter}) ${correctOpt.text}</strong></div>` : ''}
+          <div class="feedback-explanation" style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--card-border);">
+            <strong>Justificación:</strong> ${selectedOpt.explanation}
+          </div>
+        `;
+        reviewList.appendChild(item);
+      });
+    }
+
+    // Confetti System
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function startConfetti() {
+      stopConfetti();
+      const colors = ['#10B981', '#8B5CF6', '#EF4444', '#3B82F6', '#F59E0B'];
+      for (let i = 0; i < 120; i++) {
+        confetti.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          r: Math.random() * 6 + 4,
+          d: Math.random() * canvas.height,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          tilt: Math.random() * 10 - 5,
+          tiltAngleIncremental: Math.random() * 0.07 + 0.02,
+          tiltAngle: 0
+        });
+      }
+      updateConfetti();
+    }
+
+    function stopConfetti() {
+      if (confettiAnimationId) {
+        cancelAnimationFrame(confettiAnimationId);
+        confettiAnimationId = null;
+      }
+      confetti = [];
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function updateConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let active = false;
+
+      confetti.forEach((p, index) => {
+        p.tiltAngle += p.tiltAngleIncremental;
+        p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+        p.x += Math.sin(p.tiltAngle);
+        p.tilt = Math.sin(p.tiltAngle - index/3) * 15;
+
+        if (p.y <= canvas.height) {
+          active = true;
+        }
+
+        ctx.beginPath();
+        ctx.lineWidth = p.r;
+        ctx.strokeStyle = p.color;
+        ctx.moveTo(p.x + p.tilt + p.r/2, p.y);
+        ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r/2);
+        ctx.stroke();
+      });
+
+      if (active) {
+        confettiAnimationId = requestAnimationFrame(updateConfetti);
+      }
+    }
+  </script>
+</body>
+</html>
