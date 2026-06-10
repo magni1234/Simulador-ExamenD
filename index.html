@@ -941,29 +941,13 @@
 
       <!-- Configuration Panel -->
       <div class="config-panel">
-        <h3>⚙️ Opciones de Examen</h3>
-        <div class="mode-options">
-          <label class="mode-label">
-            <input type="radio" name="exam-mode" value="full" checked>
-            <div class="mode-info">
-              <span class="mode-name">Examen Nacional Completo (75 Preguntas)</span>
-              <span class="mode-desc">Subprueba de Especialidad (50 q.) + Habilidades Generales (25 q.). Máx 200 pts. Tiempo: 2 horas.</span>
-            </div>
-          </label>
-          <label class="mode-label">
-            <input type="radio" name="exam-mode" value="especialidad">
-            <div class="mode-info">
-              <span class="mode-name">Subprueba de Conocimientos Especializados (50 Preguntas)</span>
-              <span class="mode-desc">Solo casuísticas de Educación Física. Peso: 3 pts c/u. Aprobación: Mín. 84 pts (28 correctas).</span>
-            </div>
-          </label>
-          <label class="mode-label">
-            <input type="radio" name="exam-mode" value="generales">
-            <div class="mode-info">
-              <span class="mode-name">Subprueba de Habilidades Generales (25 Preguntas)</span>
-              <span class="mode-desc">Comprensión Lectora y Razonamiento Lógico. Peso: 2 pts c/u.</span>
-            </div>
-          </label>
+        <h3>📋 Reglas del Simulacro:</h3>
+        <div style="margin-top: 10px; line-height: 1.6; font-size: 0.9rem; color: var(--text-secondary);">
+          <p>• <strong>Examen Nacional Completo:</strong> 75 preguntas reales.</p>
+          <p>• <strong>Tiempo Límite:</strong> 2 horas exactas.</p>
+          <p>• <strong>Intentos Máximos:</strong> 2 intentos por usuario.</p>
+          <p>• <strong>Puntuación Oficial:</strong> Especialidad (3 pts c/u), Generales (2 pts c/u).</p>
+          <p>• <strong>Requisito de Aprobación:</strong> Mínimo 84 puntos en la subprueba de Especialidad.</p>
         </div>
       </div>
 
@@ -1024,10 +1008,13 @@
         </div>
       </div>
 
-      <div class="quiz-actions">
-        <button class="btn" id="next-btn" style="display: none;">
-          Siguiente Pregunta
+      <div class="quiz-actions" style="display: flex; gap: 16px; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+        <button class="btn" id="next-btn" style="flex: 1; min-width: 200px;">
+          Omitir Pregunta
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+        </button>
+        <button class="btn btn-logout" id="early-finish-btn" style="margin-top: 0; padding: 14px 24px; font-size: 0.9rem;">
+          Finalizar Examen 🏁
         </button>
       </div>
     </div>
@@ -1226,6 +1213,7 @@
     const logoutBtn = document.getElementById('logout-btn');
     const startBtn = document.getElementById('start-btn');
     const nextBtn = document.getElementById('next-btn');
+    const earlyFinishBtn = document.getElementById('early-finish-btn');
     const finishReviewBtn = document.getElementById('finish-review-btn');
 
     const questionProgress = document.getElementById('question-progress');
@@ -1508,10 +1496,41 @@
 
     nextBtn.addEventListener('click', () => {
       audio.playClick();
+      if (!answered) {
+        // Record as unanswered (skipped)
+        const q = activeQuestions[currentQuestionIdx];
+        userAnswers.push({
+          questionIdx: currentQuestionIdx,
+          selectedIdx: null,
+          correctIdx: q.options.findIndex(o => o.correct),
+          pointsGained: 0
+        });
+      }
       currentQuestionIdx++;
       if (currentQuestionIdx < activeQuestions.length) {
         loadQuestion(currentQuestionIdx);
       } else {
+        finishExam();
+      }
+    });
+
+    earlyFinishBtn.addEventListener('click', () => {
+      audio.playClick();
+      const confirmFinish = confirm("¿Estás seguro de que deseas finalizar tu examen ahora? Se calificarán las preguntas respondidas hasta el momento.");
+      if (confirmFinish) {
+        // Fill remaining unanswered questions as skipped
+        for (let i = currentQuestionIdx; i < activeQuestions.length; i++) {
+          const alreadyAnswered = userAnswers.some(ua => ua.questionIdx === i);
+          if (!alreadyAnswered) {
+            const q = activeQuestions[i];
+            userAnswers.push({
+              questionIdx: i,
+              selectedIdx: null,
+              correctIdx: q.options.findIndex(o => o.correct),
+              pointsGained: 0
+            });
+          }
+        }
         finishExam();
       }
     });
@@ -1581,8 +1600,7 @@
 
     // EXAM STATE CONTROLLERS
     async function startExam(isResuming) {
-      const modeRadio = document.querySelector('input[name="exam-mode"]:checked');
-      const selectedMode = modeRadio ? modeRadio.value : 'full';
+      const selectedMode = 'full';
 
       try {
         const session = await apiRequest('/api/start', 'POST', {
@@ -1680,7 +1698,11 @@
       const percent = (idx / activeQuestions.length) * 100;
       progressFill.style.width = `${percent}%`;
 
-      nextBtn.style.display = 'none';
+      nextBtn.style.display = 'inline-flex';
+      nextBtn.innerHTML = `
+        Omitir Pregunta
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+      `;
       feedbackBox.classList.remove('visible');
 
       optionsList.innerHTML = '';
@@ -1754,6 +1776,10 @@
       feedbackExplanation.innerText = opt.explanation;
 
       nextBtn.style.display = 'inline-flex';
+      nextBtn.innerHTML = `
+        Siguiente Pregunta
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+      `;
 
       const percent = ((currentQuestionIdx + 1) / activeQuestions.length) * 100;
       progressFill.style.width = `${percent}%`;
@@ -1841,6 +1867,17 @@
         if (approved) startConfetti();
       }
 
+      const motivatingPhrases = [
+        "¡El camino al éxito es la constancia! Sigue adelante, tu plaza docente te espera.",
+        "¡Cada intento te acerca más a tu meta! Excelente esfuerzo, colega.",
+        "¡El aprendizaje es un proceso continuo! Tu dedicación hoy dará frutos mañana.",
+        "¡La educación es el arma más poderosa! Gracias por tu vocación y compromiso.",
+        "¡Confía en tus conocimientos y tu preparación! Estás en el camino correcto.",
+        "¡El éxito es la suma de pequeños esfuerzos repetidos día tras día!"
+      ];
+      const randomPhrase = motivatingPhrases[Math.floor(Math.random() * motivatingPhrases.length)];
+      resultDesc.innerHTML += `<br><br><strong style="color: var(--secondary); display: block; margin-top: 12px; font-style: italic;">💡 ${randomPhrase}</strong>`;
+
       buildReviewAccordion();
     }
 
@@ -1856,9 +1893,10 @@
       reviewList.innerHTML = '';
       activeQuestions.forEach((q, idx) => {
         const uAns = userAnswers.find(ua => ua.questionIdx === idx);
-        const selectedOpt = q.options[uAns.selectedIdx];
-        const correctOpt = q.options[uAns.correctIdx];
-        const isCorrect = selectedOpt.correct;
+        const selectedOpt = uAns && uAns.selectedIdx !== null ? q.options[uAns.selectedIdx] : null;
+        const correctOpt = q.options[uAns ? uAns.correctIdx : q.options.findIndex(o => o.correct)];
+        const isCorrect = selectedOpt ? selectedOpt.correct : false;
+        const isSkipped = !uAns || uAns.selectedIdx === null;
 
         const item = document.createElement('div');
         item.className = 'review-item';
@@ -1866,14 +1904,14 @@
           <div class="review-q-header">
             <span class="review-q-num">Pregunta ${idx + 1} (${q.category})</span>
             <span class="review-status ${isCorrect ? 'correct' : 'incorrect'}">
-              ${isCorrect ? '✓ Correcta' : '✗ Incorrecta'}
+              ${isCorrect ? '✓ Correcta' : isSkipped ? '⚠️ Omitida' : '✗ Incorrecta'}
             </span>
           </div>
           <div class="review-q-text">${q.question}</div>
-          <div class="review-answer-row">Tu respuesta: <strong>(${selectedOpt.letter}) ${selectedOpt.text}</strong></div>
+          <div class="review-answer-row">Tu respuesta: <strong>${isSkipped ? 'No respondida' : `(${selectedOpt.letter}) ${selectedOpt.text}`}</strong></div>
           ${!isCorrect ? `<div class="review-answer-row" style="color: var(--correct)">Correcta: <strong>(${correctOpt.letter}) ${correctOpt.text}</strong></div>` : ''}
           <div class="feedback-explanation" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--card-border);">
-            <strong>Explicación de retroalimentación:</strong> ${selectedOpt.explanation}
+            <strong>Explicación de retroalimentación:</strong> ${isSkipped ? correctOpt.explanation : selectedOpt.explanation}
           </div>
         `;
         reviewList.appendChild(item);
