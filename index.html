@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="light">
+<html lang="es" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Simulador Oficial de Nombramiento Docente - Educación Física</title>
   <!-- SEO Meta Tags -->
-  <meta name="description" content="Simulador oficial para el examen de Nombramiento Docente en Educación Física. Acceso exclusivo con credenciales, 75 preguntas y límite de 2 intentos.">
+  <meta name="description" content="Simulador interactivo oficial para el examen de Nombramiento Docente en Educación Física en el Perú. 75 preguntas reales con ponderación oficial, límite de intentos y control de acceso.">
+  <meta name="keywords" content="Nombramiento Docente, Educación Física, MINEDU, Casuísticas, Perú, Examen Docente, Currículo Nacional">
   
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,33 +16,51 @@
   <!-- Link database script -->
   <script src="questions.js"></script>
 
-  <!-- CSS Stylesheet (Smoke White & Lilac Palette) -->
+  <!-- CSS Stylesheet -->
   <style>
-    :root {
-      --bg-smoke: #F8F9FA;
-      --bg-page: #F1F3F5;
-      --card-bg: #FFFFFF;
-      --card-border: #E2E8F0;
-      --text-primary: #1E293B;
-      --text-secondary: #64748B;
-      
-      /* Accent Colors */
-      --lead-grey: #475569;
-      --lead-light: #F1F5F9;
-      --red-accent: #DC2626;
-      --red-bg: #FEF2F2;
-      --red-border: #FCA5A5;
-      
-      --green-accent: #10B981;
-      --green-bg: #ECFDF5;
-      --green-border: #A7F3D0;
-      
-      --lilac-baby: #FAF5FF;
-      --lilac-text: #8B5CF6;
-      --lilac-border: #E9D5FF;
-      
-      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.08);
-      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    /* Design Tokens & Theme Variables */
+    :root[data-theme="dark"] {
+      --bg-gradient: radial-gradient(circle at 10% 20%, rgba(15, 23, 42, 1) 0%, rgba(9, 12, 22, 1) 90%);
+      --card-bg: rgba(30, 41, 59, 0.45);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-primary: #F8FAFC;
+      --text-secondary: #94A3B8;
+      --primary: #10B981;
+      --primary-glow: rgba(16, 185, 129, 0.2);
+      --primary-hover: #059669;
+      --secondary: #8B5CF6;
+      --secondary-glow: rgba(139, 92, 246, 0.25);
+      --correct: #10B981;
+      --correct-bg: rgba(16, 185, 129, 0.15);
+      --correct-border: rgba(16, 185, 129, 0.4);
+      --incorrect: #EF4444;
+      --incorrect-bg: rgba(239, 68, 68, 0.15);
+      --incorrect-border: rgba(239, 68, 68, 0.4);
+      --progress-bg: #1E293B;
+      --shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+      --glow-opacity: 0.15;
+    }
+
+    :root[data-theme="light"] {
+      --bg-gradient: linear-gradient(135deg, #F1F5F9 0%, #E2E8F0 100%);
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --card-border: rgba(0, 0, 0, 0.06);
+      --text-primary: #0F172A;
+      --text-secondary: #475569;
+      --primary: #059669;
+      --primary-glow: rgba(5, 150, 105, 0.15);
+      --primary-hover: #047857;
+      --secondary: #7C3AED;
+      --secondary-glow: rgba(124, 58, 237, 0.15);
+      --correct: #10B981;
+      --correct-bg: rgba(209, 250, 229, 0.8);
+      --correct-border: #10B981;
+      --incorrect: #DC2626;
+      --incorrect-bg: rgba(254, 226, 226, 0.8);
+      --incorrect-border: #EF4444;
+      --progress-bg: #E2E8F0;
+      --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+      --glow-opacity: 0.05;
     }
 
     * {
@@ -49,10 +68,11 @@
       margin: 0;
       padding: 0;
       font-family: 'Inter', sans-serif;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
     body {
-      background-color: var(--bg-page);
+      background: var(--bg-gradient);
       color: var(--text-primary);
       min-height: 100vh;
       display: flex;
@@ -61,11 +81,33 @@
       position: relative;
     }
 
+    /* Ambient Glowing Orbs */
+    .glowing-orb {
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      filter: blur(120px);
+      z-index: 0;
+      pointer-events: none;
+      opacity: var(--glow-opacity);
+    }
+    .orb-1 {
+      top: 10%;
+      left: -100px;
+      background: var(--primary);
+    }
+    .orb-2 {
+      bottom: 15%;
+      right: -100px;
+      background: var(--secondary);
+    }
+
     header {
       width: 100%;
-      max-width: 1000px;
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 20px 24px;
+      padding: 24px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -79,72 +121,61 @@
     }
 
     .logo-badge {
-      background: linear-gradient(135deg, var(--lead-grey), var(--lilac-text));
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
       color: white;
       font-family: 'Outfit', sans-serif;
       font-weight: 800;
-      font-size: 1.2rem;
-      width: 40px;
-      height: 40px;
+      font-size: 1.3rem;
+      width: 42px;
+      height: 42px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 10px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px var(--primary-glow);
     }
 
     .logo-text h1 {
       font-family: 'Outfit', sans-serif;
-      font-size: 1.15rem;
+      font-size: 1.25rem;
       font-weight: 700;
       letter-spacing: -0.5px;
       line-height: 1.1;
     }
 
     .logo-text span {
-      font-size: 0.7rem;
+      font-size: 0.75rem;
       color: var(--text-secondary);
-      font-weight: 600;
+      font-weight: 500;
       text-transform: uppercase;
-      letter-spacing: 0.8px;
+      letter-spacing: 1px;
     }
 
-    .env-badge {
-      font-size: 0.65rem;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-weight: 700;
-      border: 1px solid var(--card-border);
-    }
-    .env-local {
-      background-color: var(--lilac-baby);
-      color: var(--lilac-text);
-      border-color: var(--lilac-border);
-    }
-    .env-server {
-      background-color: var(--green-bg);
-      color: var(--green-accent);
-      border-color: var(--green-border);
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
     }
 
     .btn-icon {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      color: var(--text-secondary);
-      width: 38px;
-      height: 38px;
+      color: var(--text-primary);
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: var(--shadow-sm);
       transition: all 0.2s ease;
+      box-shadow: var(--shadow);
     }
 
     .btn-icon:hover {
-      border-color: var(--lilac-text);
-      color: var(--lilac-text);
-      transform: translateY(-1px);
+      transform: translateY(-2px);
+      border-color: var(--primary);
+      box-shadow: 0 0 10px var(--primary-glow);
     }
 
     main {
@@ -152,29 +183,31 @@
       width: 100%;
       max-width: 1000px;
       margin: 0 auto;
-      padding: 10px 24px 80px 24px;
+      padding: 16px 24px 80px 24px;
       display: flex;
       flex-direction: column;
       justify-content: center;
       z-index: 10;
     }
 
-    /* Professional Card style */
+    /* Glassmorphism Card */
     .card {
-      background-color: var(--card-bg);
+      background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 36px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 24px;
+      padding: 40px;
       box-shadow: var(--shadow);
       position: relative;
       overflow: hidden;
-      animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
     @keyframes fadeInUp {
       from {
         opacity: 0;
-        transform: translateY(15px);
+        transform: translateY(20px);
       }
       to {
         opacity: 1;
@@ -182,42 +215,34 @@
       }
     }
 
-    /* Auth panel */
+    /* Auth Screen Form CSS */
     .auth-title {
       font-family: 'Outfit', sans-serif;
-      font-size: 1.6rem;
+      font-size: 1.8rem;
       font-weight: 800;
-      margin-bottom: 8px;
-      text-align: center;
-    }
-    .auth-subtitle {
-      font-size: 0.85rem;
-      color: var(--text-secondary);
-      text-align: center;
       margin-bottom: 24px;
+      text-align: center;
     }
 
     .form-group {
-      margin-bottom: 18px;
+      margin-bottom: 20px;
       text-align: left;
     }
 
     .form-group label {
       display: block;
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--lead-grey);
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
     }
 
     .form-control {
       width: 100%;
-      background-color: var(--bg-smoke);
+      background: rgba(0, 0, 0, 0.2);
       border: 1px solid var(--card-border);
-      padding: 12px 14px;
-      border-radius: 8px;
+      padding: 14px 16px;
+      border-radius: 12px;
       color: var(--text-primary);
       font-size: 0.95rem;
       transition: all 0.2s ease;
@@ -225,88 +250,232 @@
 
     .form-control:focus {
       outline: none;
-      border-color: var(--lilac-text);
-      background-color: white;
-      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+      border-color: var(--primary);
+      box-shadow: 0 0 10px var(--primary-glow);
+    }
+
+    .auth-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .auth-toggle-link {
+      font-size: 0.85rem;
+      color: var(--secondary);
+      text-align: center;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .auth-toggle-link:hover {
+      text-decoration: underline;
     }
 
     .error-alert {
-      background-color: var(--red-bg);
-      border: 1px solid var(--red-border);
-      color: var(--red-accent);
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid var(--incorrect-border);
+      color: var(--incorrect);
       padding: 12px 16px;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 0.85rem;
       margin-bottom: 20px;
       display: none;
-      font-weight: 500;
     }
 
-    .demo-credentials {
-      margin-top: 20px;
-      background-color: var(--lilac-baby);
-      border: 1px dashed var(--lilac-border);
-      padding: 12px;
-      border-radius: 8px;
-      font-size: 0.8rem;
-      color: var(--lilac-text);
+    /* Environment badge status */
+    .env-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .env-local {
+      background: rgba(245, 158, 11, 0.12);
+      color: #F59E0B;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .env-server {
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--correct);
+      border: 1px solid var(--correct-border);
+    }
+
+    /* History table */
+    .history-section {
+      margin-top: 30px;
+      text-align: left;
+    }
+    .history-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    .history-table th, .history-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--card-border);
+      text-align: left;
+    }
+    .history-table th {
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    /* Welcome / Starter View */
+    .welcome-view {
+      text-align: center;
+    }
+
+    .welcome-icon {
+      font-size: 3.5rem;
+      margin-bottom: 15px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+      animation: pulse 2s infinite alternate;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.08); }
+    }
+
+    .welcome-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      line-height: 1.2;
+    }
+
+    .welcome-desc {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .config-panel {
+      background: rgba(0, 0, 0, 0.15);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 30px;
       text-align: left;
     }
 
-    /* Buttons */
+    .config-panel h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mode-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .mode-label {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--card-border);
+      padding: 14px 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.2s ease;
+    }
+
+    .mode-label:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--secondary);
+    }
+
+    .mode-label input[type="radio"] {
+      accent-color: var(--secondary);
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .mode-info {
+      flex: 1;
+    }
+
+    .mode-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .mode-desc {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      background-color: var(--lead-grey);
+      gap: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
       color: white;
       border: none;
-      padding: 14px 28px;
-      border-radius: 8px;
+      padding: 16px 32px;
+      border-radius: 14px;
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: 1.05rem;
       cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: var(--shadow-sm);
+      box-shadow: 0 4px 15px var(--primary-glow);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .btn:hover {
-      background-color: #334155;
-      transform: translateY(-1px);
-    }
-
-    .btn-primary {
-      background-color: var(--lilac-text);
-    }
-    .btn-primary:hover {
-      background-color: #7C3AED;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px var(--primary-glow);
+      filter: brightness(1.1);
     }
 
     .btn-logout {
       background: transparent;
       border: 1px solid var(--card-border);
       color: var(--text-secondary);
-      font-size: 0.75rem;
-      padding: 6px 12px;
-      border-radius: 6px;
+      font-size: 0.8rem;
+      padding: 8px 16px;
+      border-radius: 8px;
       cursor: pointer;
-      margin-top: 24px;
-      transition: all 0.2s ease;
-    }
-    .btn-logout:hover {
-      color: var(--red-accent);
-      border-color: var(--red-border);
+      margin-top: 14px;
     }
 
-    /* Progress bar */
+    .btn-logout:hover {
+      border-color: var(--incorrect);
+      color: var(--incorrect);
+    }
+
     .quiz-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
-      font-size: 0.8rem;
-      font-weight: 700;
+      margin-bottom: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
       color: var(--text-secondary);
     }
 
@@ -317,9 +486,9 @@
     }
 
     .meta-badge {
-      background-color: var(--bg-smoke);
-      padding: 5px 10px;
-      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 6px 12px;
+      border-radius: 8px;
       border: 1px solid var(--card-border);
       display: flex;
       align-items: center;
@@ -329,7 +498,7 @@
     .progress-bar-container {
       width: 100%;
       height: 6px;
-      background-color: var(--lead-light);
+      background: var(--progress-bg);
       border-radius: 10px;
       margin-bottom: 24px;
       overflow: hidden;
@@ -337,153 +506,162 @@
 
     .progress-bar-fill {
       height: 100%;
-      background: linear-gradient(90deg, var(--green-accent), var(--lilac-text));
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
       width: 0%;
       border-radius: 10px;
-      transition: width 0.3s ease;
-    }
-
-    /* Categories & text */
-    .subprueba-badge {
-      display: inline-block;
-      font-size: 0.65rem;
-      font-weight: 800;
-      padding: 4px 8px;
-      border-radius: 4px;
-      background-color: var(--lilac-baby);
-      color: var(--lilac-text);
-      margin-bottom: 8px;
-      border: 1px solid var(--lilac-border);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .question-category {
+      display: inline-block;
       font-size: 0.75rem;
       text-transform: uppercase;
       font-weight: 700;
-      letter-spacing: 0.8px;
-      color: var(--text-secondary);
+      letter-spacing: 1px;
+      color: var(--secondary);
+      margin-bottom: 8px;
+    }
+
+    .subprueba-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(139, 92, 246, 0.15);
+      color: var(--secondary);
       margin-bottom: 12px;
+      border: 1px solid rgba(139, 92, 246, 0.2);
     }
 
     .question-text {
-      font-size: 1.05rem;
+      font-size: 1.15rem;
       font-weight: 600;
       line-height: 1.5;
       margin-bottom: 24px;
-      color: var(--text-primary);
       white-space: pre-line;
     }
 
     .options-list {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
       margin-bottom: 24px;
     }
 
     .option-button {
-      background-color: white;
+      background: rgba(255, 255, 255, 0.02);
       border: 1px solid var(--card-border);
-      border-radius: 10px;
-      padding: 14px 18px;
+      border-radius: 14px;
+      padding: 16px 20px;
       text-align: left;
-      font-size: 0.9rem;
-      line-height: 1.4;
+      font-size: 0.95rem;
+      line-height: 1.5;
       color: var(--text-primary);
       cursor: pointer;
       display: flex;
       align-items: flex-start;
       gap: 12px;
-      transition: all 0.2s ease;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .option-letter {
-      background-color: var(--bg-smoke);
+      background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--card-border);
       color: var(--text-secondary);
       font-weight: 700;
-      width: 24px;
-      height: 24px;
-      border-radius: 4px;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
+      transition: all 0.2s ease;
     }
 
     .option-button:hover:not(.disabled) {
-      background-color: var(--bg-smoke);
-      border-color: var(--lilac-text);
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--secondary);
+      box-shadow: 0 5px 15px var(--secondary-glow);
     }
+
     .option-button:hover:not(.disabled) .option-letter {
-      background-color: var(--lilac-text);
+      background: var(--secondary);
       color: white;
+      border-color: var(--secondary);
     }
 
     .option-button.correct {
-      background-color: var(--green-bg);
-      border-color: var(--green-accent);
+      background: var(--correct-bg);
+      border-color: var(--correct-border);
     }
     .option-button.correct .option-letter {
-      background-color: var(--green-accent);
+      background: var(--correct);
       color: white;
     }
 
     .option-button.incorrect {
-      background-color: var(--red-bg);
-      border-color: var(--red-accent);
+      background: var(--incorrect-bg);
+      border-color: var(--incorrect-border);
     }
     .option-button.incorrect .option-letter {
-      background-color: var(--red-accent);
+      background: var(--incorrect);
       color: white;
     }
 
     .option-button.disabled {
       cursor: not-allowed;
-      opacity: 0.7;
+      opacity: 0.65;
     }
     .option-button.disabled:not(.correct):not(.incorrect) {
-      opacity: 0.45;
+      opacity: 0.4;
     }
 
-    /* Feedback */
     .feedback-box {
       max-height: 0;
       overflow: hidden;
       opacity: 0;
-      transition: max-height 0.3s ease, opacity 0.3s ease;
+      transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+      margin-bottom: 0;
     }
+
     .feedback-box.visible {
-      max-height: 400px;
+      max-height: 500px;
       opacity: 1;
       margin-bottom: 24px;
     }
 
     .feedback-content {
       border: 1px solid var(--card-border);
-      padding: 18px;
-      border-radius: 10px;
-      background-color: var(--bg-smoke);
+      padding: 20px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.02);
     }
 
     .feedback-title {
-      font-size: 0.95rem;
+      font-size: 1rem;
       font-weight: 700;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
-    .feedback-title.correct { color: var(--green-accent); }
-    .feedback-title.incorrect { color: var(--red-accent); }
+
+    .feedback-title.correct { color: var(--correct); }
+    .feedback-title.incorrect { color: var(--incorrect); }
 
     .feedback-explanation {
-      font-size: 0.85rem;
-      line-height: 1.5;
+      font-size: 0.9rem;
+      line-height: 1.6;
       color: var(--text-secondary);
+    }
+
+    .quiz-actions {
+      display: flex;
+      justify-content: flex-end;
     }
 
     /* Results */
@@ -493,8 +671,8 @@
 
     .score-gauge {
       position: relative;
-      width: 140px;
-      height: 140px;
+      width: 160px;
+      height: 160px;
       margin: 0 auto 20px auto;
     }
 
@@ -506,18 +684,18 @@
 
     .gauge-bg {
       fill: none;
-      stroke: var(--lead-light);
-      stroke-width: 8;
+      stroke: var(--progress-bg);
+      stroke-width: 10;
     }
 
     .gauge-fill {
       fill: none;
       stroke: url(#gaugeGradient);
-      stroke-width: 8;
+      stroke-width: 10;
       stroke-dasharray: 440;
       stroke-dashoffset: 440;
       stroke-linecap: round;
-      transition: stroke-dashoffset 1s ease;
+      transition: stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .score-text {
@@ -526,71 +704,77 @@
       left: 50%;
       transform: translate(-50%, -50%);
       font-family: 'Outfit', sans-serif;
-      font-size: 1.8rem;
+      font-size: 2rem;
       font-weight: 800;
     }
 
     .score-subtext {
-      font-size: 0.7rem;
+      font-size: 0.75rem;
       color: var(--text-secondary);
       font-weight: 500;
       display: block;
+      margin-top: -2px;
     }
 
     .result-badge {
       display: inline-block;
-      padding: 4px 12px;
+      padding: 6px 16px;
       border-radius: 20px;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
       font-weight: 700;
-      margin-bottom: 12px;
-      border: 1px solid var(--card-border);
+      margin-bottom: 16px;
     }
+
     .result-badge.badge-success {
-      background-color: var(--green-bg);
-      color: var(--green-accent);
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--correct);
+      border: 1px solid var(--correct-border);
     }
     .result-badge.badge-danger {
-      background-color: var(--red-bg);
-      color: var(--red-accent);
+      background: rgba(239, 68, 68, 0.12);
+      color: var(--incorrect);
+      border: 1px solid var(--incorrect-border);
     }
 
     .result-headline {
       font-family: 'Outfit', sans-serif;
-      font-size: 1.4rem;
+      font-size: 1.6rem;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     .result-desc {
       color: var(--text-secondary);
-      font-size: 0.9rem;
-      line-height: 1.5;
-      margin-bottom: 24px;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 28px;
     }
 
     .diagnostic-panel {
       text-align: left;
-      background-color: var(--bg-smoke);
+      background: rgba(255, 255, 255, 0.02);
       border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 24px;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 28px;
     }
 
     .diagnostic-panel h4 {
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       font-weight: 700;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .diag-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 6px 0;
+      padding: 8px 0;
       border-bottom: 1px solid var(--card-border);
-      font-size: 0.8rem;
+      font-size: 0.85rem;
     }
     .diag-item:last-child {
       border-bottom: none;
@@ -601,60 +785,61 @@
 
     .review-accordion-title {
       font-family: 'Outfit', sans-serif;
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       font-weight: 700;
       text-align: left;
-      margin-bottom: 12px;
-      margin-top: 30px;
+      margin-bottom: 14px;
+      margin-top: 36px;
     }
 
     .review-list {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
       text-align: left;
-      margin-bottom: 24px;
+      margin-bottom: 30px;
     }
 
     .review-item {
-      background-color: var(--bg-smoke);
+      background: rgba(255, 255, 255, 0.01);
       border: 1px solid var(--card-border);
-      border-radius: 8px;
-      padding: 14px;
+      border-radius: 12px;
+      padding: 16px;
     }
 
     .review-q-header {
       display: flex;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
     .review-q-num {
       font-weight: 700;
-      font-size: 0.8rem;
-      color: var(--lilac-text);
+      font-size: 0.85rem;
+      color: var(--secondary);
     }
 
     .review-status {
-      font-size: 0.7rem;
+      font-size: 0.75rem;
       font-weight: 700;
     }
-    .review-status.correct { color: var(--green-accent); }
-    .review-status.incorrect { color: var(--red-accent); }
+    .review-status.correct { color: var(--correct); }
+    .review-status.incorrect { color: var(--incorrect); }
 
     .review-q-text {
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       font-weight: 600;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
       white-space: pre-line;
     }
 
     .review-answer-row {
-      font-size: 0.75rem;
-      margin-bottom: 4px;
+      font-size: 0.8rem;
+      margin-bottom: 6px;
       color: var(--text-secondary);
     }
+    .review-answer-row strong { color: var(--text-primary); }
 
     #confetti-canvas {
       position: fixed;
@@ -665,9 +850,47 @@
       pointer-events: none;
       z-index: 100;
     }
+
+    .app-footer {
+      width: 100%;
+      text-align: center;
+      padding: 30px 20px;
+      margin-top: auto;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .footer-logo {
+      max-height: 50px;
+      width: auto;
+      display: block;
+      filter: drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.05));
+    }
+
+    .footer-rights {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      letter-spacing: 0.3px;
+    }
+
+    @media (max-width: 600px) {
+      main { padding: 12px 12px 60px 12px; }
+      .card { padding: 24px 16px; }
+      .welcome-title { font-size: 1.6rem; }
+      .question-text { font-size: 1rem; }
+      .option-button { padding: 14px; font-size: 0.85rem; }
+    }
   </style>
 </head>
 <body>
+
+  <!-- Background glow -->
+  <div class="glowing-orb orb-1"></div>
+  <div class="glowing-orb orb-2"></div>
 
   <canvas id="confetti-canvas"></canvas>
 
@@ -675,29 +898,31 @@
     <div class="logo-container">
       <div class="logo-badge">EF</div>
       <div class="logo-text">
-        <h1>Simulacro Docente</h1>
-        <span>Evaluación Nacional Oficial</span>
+        <h1>Simulacro Nacional</h1>
+        <span>MINEDU Nombramiento</span>
       </div>
     </div>
     <div class="header-actions">
       <span class="env-badge env-local" id="environment-badge">Modo Local</span>
-      <button class="btn-icon" id="sound-toggle" aria-label="Alternar Sonido" title="Alternar Sonido">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+      <button class="btn-icon" id="sound-toggle" aria-label="Alternar Sonidos" title="Alternar Sonidos">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-volume-2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+      </button>
+      <button class="btn-icon" id="theme-toggle" aria-label="Alternar Tema" title="Alternar Tema">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-moon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
       </button>
     </div>
   </header>
 
   <main>
-    <!-- LOGIN VIEW -->
+    <!-- AUTH CARD (LOGIN / REGISTER) -->
     <div class="card" id="auth-card" style="display: block;">
-      <h2 class="auth-title">Ingreso al Simulador</h2>
-      <p class="auth-subtitle">Introduce tus credenciales de acceso asignadas por el administrador.</p>
+      <h2 class="auth-title" id="auth-card-title">Iniciar Sesión</h2>
       
-      <div class="error-alert" id="auth-error"></div>
+      <div class="error-alert" id="auth-error">Error message</div>
 
       <div class="form-group">
-        <label for="auth-username">Usuario / Código</label>
-        <input type="text" id="auth-username" class="form-control" placeholder="Ej: COD-7291">
+        <label for="auth-username">Nombre de Usuario / Correo</label>
+        <input type="text" id="auth-username" class="form-control" placeholder="Ej: pedro_docente">
       </div>
       <div class="form-group">
         <label for="auth-password">Contraseña</label>
@@ -705,49 +930,65 @@
       </div>
 
       <div class="auth-actions">
-        <button class="btn btn-primary" id="auth-primary-btn" style="width: 100%;">Acceder a la Evaluación</button>
-      </div>
-
-      <div class="demo-credentials" id="demo-credentials-box" style="display: none;">
-        <strong>🔑 Credenciales de demostración en Modo Local:</strong><br>
-        • Usuario: <code>DOCENTE_DEMO</code> | Contraseña: <code>123</code><br>
-        • Usuario: <code>DOCENTE_TEST</code> | Contraseña: <code>abc</code>
+        <button class="btn" id="auth-primary-btn">Entrar al Simulador</button>
+        <span class="auth-toggle-link" id="auth-toggle-btn">¿No tienes cuenta? Regístrate gratis</span>
       </div>
     </div>
 
     <!-- WELCOME VIEW -->
     <div class="card welcome-view" id="welcome-card" style="display: none;">
-      <div class="welcome-icon">🎓</div>
+      <div class="welcome-icon">📋</div>
       <h2 class="welcome-title">Bienvenido, <span id="welcome-username">Docente</span></h2>
       <p class="welcome-desc">
-        Estás por iniciar el simulacro de la Prueba Nacional completa de **75 preguntas** (Especialidad Educación Física y Habilidades Generales).
+        Prepara el examen oficial con la cantidad exacta de preguntas del MINEDU, límite estricto de <strong>2 intentos</strong> de <strong>2 horas</strong> c/u.
       </p>
 
-      <div class="config-panel" style="text-align: left; line-height: 1.5; font-size: 0.9rem; color: var(--text-secondary);">
-        <h3 style="color: var(--text-primary); font-size: 0.95rem; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
-          📋 Reglas del Simulacro:
-        </h3>
-        <p>• <strong>Tiempo Límite:</strong> 2 Horas exactas.</p>
-        <p>• <strong>Intentos Máximos:</strong> 2 Intentos permitidos por usuario.</p>
-        <p>• <strong>Aprobación:</strong> Mínimo 84 puntos en la subprueba de especialidad.</p>
-        <p>• <strong>Ponderación:</strong> Especialidad (3 pts c/u), Generales (2 pts c/u).</p>
+      <!-- Configuration Panel -->
+      <div class="config-panel">
+        <h3>⚙️ Opciones de Examen</h3>
+        <div class="mode-options">
+          <label class="mode-label">
+            <input type="radio" name="exam-mode" value="full" checked>
+            <div class="mode-info">
+              <span class="mode-name">Examen Nacional Completo (75 Preguntas)</span>
+              <span class="mode-desc">Subprueba de Especialidad (50 q.) + Habilidades Generales (25 q.). Máx 200 pts. Tiempo: 2 horas.</span>
+            </div>
+          </label>
+          <label class="mode-label">
+            <input type="radio" name="exam-mode" value="especialidad">
+            <div class="mode-info">
+              <span class="mode-name">Subprueba de Conocimientos Especializados (50 Preguntas)</span>
+              <span class="mode-desc">Solo casuísticas de Educación Física. Peso: 3 pts c/u. Aprobación: Mín. 84 pts (28 correctas).</span>
+            </div>
+          </label>
+          <label class="mode-label">
+            <input type="radio" name="exam-mode" value="generales">
+            <div class="mode-info">
+              <span class="mode-name">Subprueba de Habilidades Generales (25 Preguntas)</span>
+              <span class="mode-desc">Comprensión Lectora y Razonamiento Lógico. Peso: 2 pts c/u.</span>
+            </div>
+          </label>
+        </div>
       </div>
 
       <div id="start-actions-container">
-        <button class="btn btn-primary" id="start-btn">Comenzar Intento</button>
+        <button class="btn" id="start-btn">Comenzar Intento</button>
       </div>
 
       <div class="history-section" id="history-section" style="display: none;">
-        <h3 class="history-title">📚 Tus Intentos</h3>
+        <h3 class="history-title">📚 Historial de tus Intentos (Máx 2)</h3>
         <table class="history-table">
           <thead>
             <tr>
-              <th>Fecha</th>
+              <th>Fecha/Hora</th>
+              <th>Modo</th>
               <th>Puntaje</th>
               <th>Estado</th>
             </tr>
           </thead>
-          <tbody id="history-table-body"></tbody>
+          <tbody id="history-table-body">
+            <!-- Dynamically populated -->
+          </tbody>
         </table>
       </div>
 
@@ -760,11 +1001,11 @@
         <span id="question-progress">Pregunta 1 de 75</span>
         <div class="quiz-meta">
           <div class="meta-badge" id="timer-badge">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
             <span id="time-display">02:00:00</span>
           </div>
           <div class="meta-badge" id="score-badge">
-            <span style="color: var(--green-accent);">Pts:</span>
+            <span style="color: var(--primary);">Pts:</span>
             <span id="score-display">0</span>
           </div>
         </div>
@@ -774,8 +1015,8 @@
         <div class="progress-bar-fill" id="progress-bar-fill"></div>
       </div>
 
-      <div class="subprueba-badge" id="subprueba-badge">Especialidad</div>
-      <div class="question-category" id="question-category">Didáctica</div>
+      <div class="subprueba-badge" id="subprueba-badge">Habilidades Generales</div>
+      <div class="question-category" id="question-category">Comprensión Lectora</div>
       <div class="question-text" id="question-text">Cargando...</div>
 
       <div class="options-list" id="options-list"></div>
@@ -788,8 +1029,9 @@
       </div>
 
       <div class="quiz-actions">
-        <button class="btn btn-primary" id="next-btn" style="display: none;">
+        <button class="btn" id="next-btn" style="display: none;">
           Siguiente Pregunta
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
         </button>
       </div>
     </div>
@@ -800,8 +1042,8 @@
         <svg class="score-svg" viewBox="0 0 160 160">
           <defs>
             <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="var(--green-accent)" />
-              <stop offset="100%" stop-color="var(--lilac-text)" />
+              <stop offset="0%" stop-color="var(--primary)" />
+              <stop offset="100%" stop-color="var(--secondary)" />
             </linearGradient>
           </defs>
           <circle class="gauge-bg" cx="80" cy="80" r="70"></circle>
@@ -823,11 +1065,11 @@
           <span>Tiempo empleado:</span>
           <span class="diag-val" id="diag-time">00:00</span>
         </div>
-        <div class="diag-item">
+        <div class="diag-item" id="diag-item-ped">
           <span>Subprueba Especialidad (Mín. 84 requerido):</span>
           <span class="diag-val" id="diag-val-ped">0 / 150 pts</span>
         </div>
-        <div class="diag-item">
+        <div class="diag-item" id="diag-item-gen">
           <span>Subprueba Habilidades Generales:</span>
           <span class="diag-val" id="diag-val-gen">0 / 50 pts</span>
         </div>
@@ -842,13 +1084,20 @@
       </div>
 
       <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
-        <button class="btn btn-primary" id="finish-review-btn">Volver al Panel</button>
+        <button class="btn" id="finish-review-btn">Volver al Panel</button>
       </div>
 
       <h3 class="review-accordion-title">🔍 Detalle de Respuestas</h3>
       <div class="review-list" id="review-list"></div>
     </div>
   </main>
+
+  <footer class="app-footer">
+    <div class="footer-logo-container">
+      <img src="Firma%20negra%202026.png" alt="Logo Walter Vellaneda" class="footer-logo">
+    </div>
+    <p class="footer-rights">Material elaborado por Walter Vellaneda. Todos los derechos reservados.</p>
+  </footer>
 
   <script>
     // Audio Synthesizer Class (Web Audio API)
@@ -915,7 +1164,7 @@
       }
     }
 
-    // Dynamic environment API endpoints & Fallback
+    // Server API integration and simulated offline database
     const API_BASE = window.location.origin.includes('file://') ? null : window.location.origin;
     let currentUser = null;
     let currentAttempt = null;
@@ -923,10 +1172,7 @@
 
     // Local DB Simulation for Offline mode
     const simulatedDB = {
-      users: JSON.parse(localStorage.getItem('sim_users')) || [
-        { id: 'sim_usr_1', username: 'DOCENTE_DEMO', password: '123', attemptsUsed: 0 },
-        { id: 'sim_usr_2', username: 'DOCENTE_TEST', password: 'abc', attemptsUsed: 0 }
-      ],
+      users: JSON.parse(localStorage.getItem('sim_users')) || [],
       attempts: JSON.parse(localStorage.getItem('sim_attempts')) || []
     };
 
@@ -935,23 +1181,20 @@
       localStorage.setItem('sim_attempts', JSON.stringify(simulatedDB.attempts));
     }
 
-    // Render environment status badge
+    // Detect environment and update badge
     const environmentBadge = document.getElementById('environment-badge');
-    const demoCredentialsBox = document.getElementById('demo-credentials-box');
     if (API_BASE) {
       environmentBadge.innerText = "Modo Servidor";
       environmentBadge.className = "env-badge env-server";
       isOfflineMode = false;
-      demoCredentialsBox.style.display = 'none';
     } else {
       environmentBadge.innerText = "Modo Local (Simulado)";
       environmentBadge.className = "env-badge env-local";
       isOfflineMode = true;
-      demoCredentialsBox.style.display = 'block';
     }
 
-    // State Variables
-    let activeQuestions = [...examQuestions]; // Focuses exactly on the 75 questions
+    // STATE VARIABLES
+    let activeQuestions = [];
     let currentQuestionIdx = 0;
     let scoreGenerales = 0;
     let scorePedagogicos = 0;
@@ -959,21 +1202,25 @@
     let answered = false;
     let selectedOptionIdx = null;
     let userAnswers = [];
-    let timeLimitMs = 2 * 60 * 60 * 1000; // Strictly 2 hours
+    let timeLimitMs = 2 * 60 * 60 * 1000; // Strictly 2 hours = 7200000ms
     let timerInterval = null;
     let startTime = null;
+    let examMode = 'full';
+    let maxPossiblePoints = 200;
 
     const audio = new AudioSynthesizer();
 
-    // DOM selectors
+    // DOM Elements
     const authCard = document.getElementById('auth-card');
     const welcomeCard = document.getElementById('welcome-card');
     const quizCard = document.getElementById('quiz-card');
     const resultsCard = document.getElementById('results-card');
 
+    const authCardTitle = document.getElementById('auth-card-title');
     const authUsernameInput = document.getElementById('auth-username');
     const authPasswordInput = document.getElementById('auth-password');
     const authPrimaryBtn = document.getElementById('auth-primary-btn');
+    const authToggleBtn = document.getElementById('auth-toggle-btn');
     const authError = document.getElementById('auth-error');
 
     const welcomeUsername = document.getElementById('welcome-username');
@@ -1013,6 +1260,7 @@
     const reviewList = document.getElementById('review-list');
 
     const soundToggle = document.getElementById('sound-toggle');
+    const themeToggle = document.getElementById('theme-toggle');
 
     // Confetti Canvas setup
     const canvas = document.getElementById('confetti-canvas');
@@ -1020,17 +1268,27 @@
     let confetti = [];
     let confettiAnimationId = null;
 
-    // Sound Toggle Handler
+    // Theme & Sound toggles
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      themeToggle.innerHTML = newTheme === 'dark' 
+        ? `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-moon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`
+        : `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-sun"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
+      audio.playClick();
+    });
+
     soundToggle.addEventListener('click', () => {
       audio.enabled = !audio.enabled;
       soundToggle.style.opacity = audio.enabled ? "1" : "0.5";
       soundToggle.innerHTML = audio.enabled
-        ? `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`
-        : `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`;
+        ? `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-volume-2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>`
+        : `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-volume-x"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>`;
       audio.playClick();
     });
 
-    // API consumer with Simulated Local fallback
+    // API calls with Simulated fallback
     async function apiRequest(endpoint, method, body) {
       if (isOfflineMode) {
         return handleSimulatedRequest(endpoint, method, body);
@@ -1046,22 +1304,37 @@
         if (!response.ok) throw new Error(data.error || 'Algo salió mal');
         return data;
       } catch (err) {
+        // Fallback to offline if server becomes unreachable
         console.warn("Conexión al servidor fallida. Cambiando a Modo Local Simulado.");
         isOfflineMode = true;
         environmentBadge.innerText = "Modo Local (Simulado)";
         environmentBadge.className = "env-badge env-local";
-        demoCredentialsBox.style.display = 'block';
         return handleSimulatedRequest(endpoint, method, body);
       }
     }
 
-    // Simulated local router
+    // Simulated Offline REST Router
     function handleSimulatedRequest(endpoint, method, body) {
       return new Promise((resolve, reject) => {
         setTimeout(() => {
-          if (endpoint === '/api/login') {
-            const user = simulatedDB.users.find(u => u.username.toUpperCase() === body.username.trim().toUpperCase() && u.password === body.password);
-            if (!user) return reject(new Error('Credenciales inválidas o usuario no registrado'));
+          if (endpoint === '/api/register') {
+            const userExists = simulatedDB.users.find(u => u.username.toLowerCase() === body.username.toLowerCase());
+            if (userExists) return reject(new Error('El usuario ya existe'));
+            
+            const newUser = {
+              id: 'sim_usr_' + Math.random().toString(36).substr(2, 9),
+              username: body.username,
+              password: body.password, // No hash for local simulated simplicity
+              attemptsUsed: 0
+            };
+            simulatedDB.users.push(newUser);
+            saveSimulatedDB();
+            resolve({ message: 'Usuario registrado exitosamente', userId: newUser.id });
+          } 
+          
+          else if (endpoint === '/api/login') {
+            const user = simulatedDB.users.find(u => u.username.toLowerCase() === body.username.toLowerCase() && u.password === body.password);
+            if (!user) return reject(new Error('Credenciales inválidas'));
             
             const attempts = simulatedDB.attempts.filter(a => a.userId === user.id);
             const activeAttempt = attempts.find(a => a.status === 'in_progress');
@@ -1094,12 +1367,13 @@
             if (activeAttempt) {
               const elapsed = Date.now() - activeAttempt.startTime;
               if (elapsed > 2 * 60 * 60 * 1000) {
+                // Auto-expire
                 activeAttempt.status = 'expired';
                 activeAttempt.endTime = activeAttempt.startTime + (2 * 60 * 60 * 1000);
                 user.attemptsUsed = finishedAttempts.length + 1;
                 saveSimulatedDB();
                 if (user.attemptsUsed >= 2) {
-                  return reject(new Error('Tu intento activo expiró por tiempo límite. Has agotado tus 2 intentos máximos.'));
+                  return reject(new Error('Tu intento activo expiró por límite de tiempo. Has agotado tus 2 intentos máximos.'));
                 }
                 activeAttempt = null;
               } else {
@@ -1108,7 +1382,8 @@
                   attemptId: activeAttempt.id,
                   startTime: activeAttempt.startTime,
                   elapsedMs: elapsed,
-                  timeLimitMs: 2 * 60 * 60 * 1000
+                  timeLimitMs: 2 * 60 * 60 * 1000,
+                  examMode: activeAttempt.examMode
                 });
               }
             }
@@ -1119,6 +1394,7 @@
               startTime: Date.now(),
               endTime: null,
               score: null,
+              examMode: body.examMode || 'full',
               status: 'in_progress'
             };
 
@@ -1131,7 +1407,8 @@
               attemptId: newAttempt.id,
               startTime: newAttempt.startTime,
               elapsedMs: 0,
-              timeLimitMs: 2 * 60 * 60 * 1000
+              timeLimitMs: 2 * 60 * 60 * 1000,
+              examMode: newAttempt.examMode
             });
           }
 
@@ -1181,15 +1458,25 @@
                 id: a.id,
                 score: a.score,
                 date: new Date(a.endTime).toLocaleString(),
-                status: a.status
+                status: a.status,
+                examMode: a.examMode
               }))
             });
           }
-        }, 150);
+        }, 300);
       });
     }
 
-    // LOGIN ACTION
+    // AUTH ACTIONS
+    let isRegistering = false;
+    authToggleBtn.addEventListener('click', () => {
+      isRegistering = !isRegistering;
+      authCardTitle.innerText = isRegistering ? "Registrarse Gratis" : "Iniciar Sesión";
+      authPrimaryBtn.innerText = isRegistering ? "Crear Cuenta e Ingresar" : "Entrar al Simulador";
+      authToggleBtn.innerText = isRegistering ? "¿Ya tienes cuenta? Inicia sesión" : "¿No tienes cuenta? Regístrate gratis";
+      authError.style.display = 'none';
+    });
+
     authPrimaryBtn.addEventListener('click', async () => {
       audio.playClick();
       const username = authUsernameInput.value.trim();
@@ -1201,15 +1488,21 @@
       }
 
       authError.style.display = 'none';
+      const endpoint = isRegistering ? '/api/register' : '/api/login';
 
       try {
+        if (isRegistering) {
+          await apiRequest('/api/register', 'POST', { username, password });
+          isRegistering = false; // Toggle to login
+        }
+        
         const loginData = await apiRequest('/api/login', 'POST', { username, password });
         currentUser = {
           id: loginData.userId,
           username: loginData.username
         };
 
-        localStorage.setItem('docente_userId_sub', currentUser.id);
+        localStorage.setItem('docente_userId', currentUser.id);
         authCard.style.display = 'none';
         welcomeCard.style.display = 'block';
         loadDashboard();
@@ -1224,9 +1517,10 @@
       audio.playIncorrect();
     }
 
-    // Auto-login verify
-    const savedUserId = localStorage.getItem('docente_userId_sub');
+    // Auto-login check
+    const savedUserId = localStorage.getItem('docente_userId');
     if (savedUserId) {
+      // Find in local memory or call status check
       currentUser = { id: savedUserId };
       authCard.style.display = 'none';
       welcomeCard.style.display = 'block';
@@ -1235,7 +1529,7 @@
 
     logoutBtn.addEventListener('click', () => {
       audio.playClick();
-      localStorage.removeItem('docente_userId_sub');
+      localStorage.removeItem('docente_userId');
       currentUser = null;
       welcomeCard.style.display = 'none';
       authCard.style.display = 'block';
@@ -1258,13 +1552,15 @@
         const status = await apiRequest(`/api/status/${currentUser.id}`, 'GET');
         welcomeUsername.innerText = status.username;
 
+        // Render attempt actions
         startActionsContainer.innerHTML = '';
         
         if (status.activeAttempt) {
           currentAttempt = status.activeAttempt;
           startActionsContainer.innerHTML = `
-            <button class="btn btn-primary" id="resume-btn" style="background-color: var(--lilac-text);">
+            <button class="btn" id="resume-btn" style="background: linear-gradient(135deg, var(--secondary), var(--secondary-glow)); box-shadow: 0 4px 15px var(--secondary-glow);">
               Reanudar Intento Activo
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
             </button>
           `;
           document.getElementById('resume-btn').addEventListener('click', () => {
@@ -1279,7 +1575,7 @@
           `;
         } else {
           startActionsContainer.innerHTML = `
-            <button class="btn btn-primary" id="start-btn-dashboard">
+            <button class="btn" id="start-btn-dashboard">
               Comenzar Intento (${2 - status.attemptsUsed} disponible/s)
             </button>
           `;
@@ -1289,16 +1585,18 @@
           });
         }
 
-        // Render history
+        // Render attempts history table
         if (status.history && status.history.length > 0) {
           historySection.style.display = 'block';
           historyTableBody.innerHTML = '';
           status.history.forEach(hist => {
             const tr = document.createElement('tr');
             let scoreStr = hist.score !== null ? `${hist.score} pts` : 'N/A';
+            let modeStr = hist.examMode === 'full' ? 'Completo (75q)' : hist.examMode === 'especialidad' ? 'Especialidad (50q)' : 'Generales (25q)';
             tr.innerHTML = `
               <td>${hist.date}</td>
-              <td style="font-weight: 700; color: var(--lilac-text);">${scoreStr}</td>
+              <td>${modeStr}</td>
+              <td style="font-weight: 700; color: var(--primary);">${scoreStr}</td>
               <td><span class="review-status ${hist.status === 'completed' ? 'correct' : 'incorrect'}">${hist.status.toUpperCase()}</span></td>
             `;
             historyTableBody.appendChild(tr);
@@ -1311,15 +1609,37 @@
       }
     }
 
-    // EXAM TIMERS AND LOGIC
+    // EXAM STATE CONTROLLERS
     async function startExam(isResuming) {
+      const modeRadio = document.querySelector('input[name="exam-mode"]:checked');
+      const selectedMode = modeRadio ? modeRadio.value : 'full';
+
       try {
         const session = await apiRequest('/api/start', 'POST', {
-          userId: currentUser.id
+          userId: currentUser.id,
+          examMode: selectedMode
         });
 
         currentAttempt = session;
-        activeQuestions = [...examQuestions];
+        examMode = session.examMode;
+
+        // Set Questions
+        if (examMode === 'full') {
+          activeQuestions = [...examQuestions];
+          maxPossiblePoints = 200;
+          document.getElementById('diag-item-ped').style.display = 'flex';
+          document.getElementById('diag-item-gen').style.display = 'flex';
+        } else if (examMode === 'especialidad') {
+          activeQuestions = examQuestions.filter(q => q.subprueba === 'pedagogicos');
+          maxPossiblePoints = 150;
+          document.getElementById('diag-item-ped').style.display = 'flex';
+          document.getElementById('diag-item-gen').style.display = 'none';
+        } else if (examMode === 'generales') {
+          activeQuestions = examQuestions.filter(q => q.subprueba === 'generales');
+          maxPossiblePoints = 50;
+          document.getElementById('diag-item-ped').style.display = 'none';
+          document.getElementById('diag-item-gen').style.display = 'flex';
+        }
 
         currentQuestionIdx = 0;
         scoreGenerales = 0;
@@ -1328,6 +1648,7 @@
         userAnswers = [];
         scoreDisplay.innerText = 0;
 
+        // Configure timer
         startTime = Date.now() - session.elapsedMs;
         timeLimitMs = session.timeLimitMs;
 
@@ -1351,8 +1672,8 @@
       if (remaining <= 0) {
         clearInterval(timerInterval);
         timeDisplay.innerText = "00:00:00";
-        alert("¡El tiempo límite oficial de 2 horas ha terminado! Se enviará tu examen automáticamente.");
         finishExam();
+        alert("¡El tiempo límite oficial de 2 horas ha terminado! Se ha enviado tu examen automáticamente y se ha guardado tu calificación.");
         return;
       }
 
@@ -1373,14 +1694,14 @@
       
       if (q.subprueba === 'generales') {
         subpruebaBadge.innerText = "Subprueba: Habilidades Generales (2 Pts)";
-        subpruebaBadge.style.color = "var(--lilac-text)";
-        subpruebaBadge.style.backgroundColor = "var(--lilac-baby)";
-        subpruebaBadge.style.borderColor = "var(--lilac-border)";
+        subpruebaBadge.style.color = "var(--secondary)";
+        subpruebaBadge.style.backgroundColor = "var(--secondary-glow)";
+        subpruebaBadge.style.borderColor = "var(--card-border)";
       } else {
         subpruebaBadge.innerText = "Subprueba: Conocimientos de Especialidad (3 Pts)";
-        subpruebaBadge.style.color = "var(--green-accent)";
-        subpruebaBadge.style.backgroundColor = "var(--green-bg)";
-        subpruebaBadge.style.borderColor = "var(--green-border)";
+        subpruebaBadge.style.color = "var(--primary)";
+        subpruebaBadge.style.backgroundColor = "var(--primary-glow)";
+        subpruebaBadge.style.borderColor = "var(--correct-border)";
       }
 
       questionCategory.innerText = q.category;
@@ -1450,14 +1771,14 @@
       if (isCorrect) {
         feedbackTitle.className = "feedback-title correct";
         feedbackTitle.innerHTML = `
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
           ¡Respuesta Correcta! (+${pts} pts)
         `;
       } else {
         feedbackTitle.className = "feedback-title incorrect";
         feedbackTitle.innerHTML = `
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-          Justificación Técnica:
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          Retroalimentación Pedagógica:
         `;
       }
       feedbackExplanation.innerText = opt.explanation;
@@ -1471,6 +1792,7 @@
     async function finishExam() {
       if (timerInterval) clearInterval(timerInterval);
       
+      // Send result to backend
       try {
         await apiRequest('/api/submit', 'POST', {
           userId: currentUser.id,
@@ -1479,7 +1801,7 @@
           answers: userAnswers
         });
       } catch (err) {
-        console.error("Error enviando respuestas:", err);
+        console.error("Error enviando examen:", err);
       }
 
       quizCard.style.display = 'none';
@@ -1494,31 +1816,59 @@
 
       diagValPed.innerText = `${scorePedagogicos} / 150 pts`;
       diagValGen.innerText = `${scoreGenerales} / 50 pts`;
-      diagValTotal.innerText = `${totalScore} / 200 pts`;
+      diagValTotal.innerText = `${totalScore} / ${maxPossiblePoints} pts`;
 
       finalScoreTxt.innerText = totalScore;
-      finalScoreTotal.innerText = `/ 200 pts`;
+      finalScoreTotal.innerText = `/ ${maxPossiblePoints} pts`;
 
       const perimeter = 440;
-      const offset = perimeter - (perimeter * totalScore) / 200;
+      const offset = perimeter - (perimeter * totalScore) / maxPossiblePoints;
       gaugeFill.style.strokeDashoffset = offset;
 
-      const approved = scorePedagogicos >= 84;
-      if (approved) {
-        diagStatus.innerText = "¡APROBADO NACIONAL! 🎉";
-        diagStatus.style.color = "var(--green-accent)";
-        resultBadge.className = "result-badge badge-success";
-        resultBadge.innerText = "Aprobado";
-        resultHeadline.innerText = "¡Excelente preparación!";
-        resultDesc.innerText = "Has superado el puntaje mínimo de especialidad (84 pts) requerido por el MINEDU y estás calificado para avanzar a la etapa descentralizada.";
-        startConfetti();
-      } else {
-        diagStatus.innerText = "REPROBADO ❌";
-        diagStatus.style.color = "var(--red-accent)";
-        resultBadge.className = "result-badge badge-danger";
-        resultBadge.innerText = "Reprobado";
-        resultHeadline.innerText = "Sigue Repasando";
-        resultDesc.innerText = `No has alcanzado los 84 puntos mínimos exigidos en la subprueba de Conocimientos Especializados (Obtuviste: ${scorePedagogicos} pts).`;
+      let approved = false;
+
+      if (examMode === 'full') {
+        approved = scorePedagogicos >= 84;
+        if (approved) {
+          diagStatus.innerText = "¡APROBADO NACIONAL! 🎉";
+          diagStatus.style.color = "var(--correct)";
+          resultBadge.className = "result-badge badge-success";
+          resultBadge.innerText = "Aprobado";
+          resultHeadline.innerText = "¡Excelente preparación!";
+          resultDesc.innerText = "Has superado el puntaje mínimo de especialidad (84 pts) requerido por el MINEDU y estás calificado para avanzar a la etapa descentralizada.";
+          startConfetti();
+        } else {
+          diagStatus.innerText = "REPROBADO ❌";
+          diagStatus.style.color = "var(--incorrect)";
+          resultBadge.className = "result-badge badge-danger";
+          resultBadge.innerText = "Reprobado";
+          resultHeadline.innerText = "Sigue Repasando";
+          resultDesc.innerText = `No has alcanzado los 84 puntos mínimos exigidos en la subprueba de Conocimientos Especializados (Obtuviste: ${scorePedagogicos} pts). Enfócate en el área pedagógica de Educación Física.`;
+        }
+      } else if (examMode === 'especialidad') {
+        approved = scorePedagogicos >= 84;
+        if (approved) {
+          diagStatus.innerText = "APROBADO DE ESPECIALIDAD 🎉";
+          diagStatus.style.color = "var(--correct)";
+          resultBadge.className = "result-badge badge-success";
+          resultHeadline.innerText = "¡Meta de Especialidad Alcanzada!";
+          resultDesc.innerText = `¡Felicidades! Lograste superar los 84 puntos obligatorios obteniendo ${scorePedagogicos} puntos.`;
+          startConfetti();
+        } else {
+          diagStatus.innerText = "NO APROBADO ❌";
+          diagStatus.style.color = "var(--incorrect)";
+          resultBadge.className = "result-badge badge-danger";
+          resultHeadline.innerText = "Por Debajo del Mínimo";
+          resultDesc.innerText = `Obtuviste ${scorePedagogicos} de 150 puntos. Recuerda que necesitas al menos 28 respuestas correctas (84 puntos) para aprobar.`;
+        }
+      } else if (examMode === 'generales') {
+        approved = totalScore >= 30;
+        diagStatus.innerText = approved ? "BUEN RENDIMIENTO 👍" : "RENDIMIENTO BÁSICO ⚠️";
+        diagStatus.style.color = approved ? "var(--correct)" : "var(--text-secondary)";
+        resultBadge.className = approved ? "result-badge badge-success" : "result-badge badge-danger";
+        resultHeadline.innerText = approved ? "¡Buen puntaje en Habilidades!" : "Puedes mejorar tu rapidez de lectura";
+        resultDesc.innerText = `Lograste ${totalScore} de 50 puntos en razonamiento lógico y lectura.`;
+        if (approved) startConfetti();
       }
 
       buildReviewAccordion();
@@ -1551,9 +1901,9 @@
           </div>
           <div class="review-q-text">${q.question}</div>
           <div class="review-answer-row">Tu respuesta: <strong>(${selectedOpt.letter}) ${selectedOpt.text}</strong></div>
-          ${!isCorrect ? `<div class="review-answer-row" style="color: var(--green-accent)">Correcta: <strong>(${correctOpt.letter}) ${correctOpt.text}</strong></div>` : ''}
-          <div class="feedback-explanation" style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--card-border);">
-            <strong>Justificación:</strong> ${selectedOpt.explanation}
+          ${!isCorrect ? `<div class="review-answer-row" style="color: var(--correct)">Correcta: <strong>(${correctOpt.letter}) ${correctOpt.text}</strong></div>` : ''}
+          <div class="feedback-explanation" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--card-border);">
+            <strong>Explicación de retroalimentación:</strong> ${selectedOpt.explanation}
           </div>
         `;
         reviewList.appendChild(item);
@@ -1570,7 +1920,7 @@
 
     function startConfetti() {
       stopConfetti();
-      const colors = ['#10B981', '#8B5CF6', '#EF4444', '#3B82F6', '#F59E0B'];
+      const colors = ['#10B981', '#8B5CF6', '#F59E0B', '#3B82F6', '#EF4444'];
       for (let i = 0; i < 120; i++) {
         confetti.push({
           x: Math.random() * canvas.width,
