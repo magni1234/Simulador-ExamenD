@@ -936,7 +936,7 @@
       <div class="welcome-icon">📋</div>
       <h2 class="welcome-title">Bienvenido, <span id="welcome-username">Docente</span></h2>
       <p class="welcome-desc">
-        Prepara el examen oficial con la cantidad exacta de preguntas del MINEDU, límite estricto de <strong>2 intentos</strong> de <strong>2 horas</strong> c/u.
+        Prepara el examen oficial con la cantidad exacta de preguntas del MINEDU, límite estricto de <strong>2 intentos</strong> de <strong>3 horas y 45 minutos</strong> c/u.
       </p>
 
       <!-- Configuration Panel -->
@@ -944,7 +944,7 @@
         <h3>📋 Reglas del Simulacro:</h3>
         <div style="margin-top: 10px; line-height: 1.6; font-size: 0.9rem; color: var(--text-secondary);">
           <p>• <strong>Examen Nacional Completo:</strong> 75 preguntas reales.</p>
-          <p>• <strong>Tiempo Límite:</strong> 2 horas exactas.</p>
+          <p>• <strong>Tiempo Límite:</strong> 3 horas y 45 minutos.</p>
           <p>• <strong>Intentos Máximos:</strong> 2 intentos por usuario.</p>
           <p>• <strong>Puntuación Oficial:</strong> Especialidad (3 pts c/u), Generales (2 pts c/u).</p>
           <p>• <strong>Requisito de Aprobación:</strong> Mínimo 84 puntos en la subprueba de Especialidad.</p>
@@ -1185,7 +1185,7 @@
     let answered = false;
     let selectedOptionIdx = null;
     let userAnswers = [];
-    let timeLimitMs = 2 * 60 * 60 * 1000; // Strictly 2 hours = 7200000ms
+    let timeLimitMs = (3 * 60 + 45) * 60 * 1000; // 3 hours and 45 minutes
     let timerInterval = null;
     let startTime = null;
     let examMode = 'full';
@@ -1319,7 +1319,7 @@
               activeAttempt: activeAttempt ? {
                 id: activeAttempt.id,
                 startTime: activeAttempt.startTime,
-                timeLimitMs: 2 * 60 * 60 * 1000,
+                timeLimitMs: (3 * 60 + 45) * 60 * 1000,
                 elapsedMs: Date.now() - activeAttempt.startTime
               } : null
             });
@@ -1338,11 +1338,10 @@
 
             let activeAttempt = userAttempts.find(a => a.status === 'in_progress');
             if (activeAttempt) {
-              const elapsed = Date.now() - activeAttempt.startTime;
-              if (elapsed > 2 * 60 * 60 * 1000) {
+              if (elapsed > (3 * 60 + 45) * 60 * 1000) {
                 // Auto-expire
                 activeAttempt.status = 'expired';
-                activeAttempt.endTime = activeAttempt.startTime + (2 * 60 * 60 * 1000);
+                activeAttempt.endTime = activeAttempt.startTime + ((3 * 60 + 45) * 60 * 1000);
                 user.attemptsUsed = finishedAttempts.length + 1;
                 saveSimulatedDB();
                 if (user.attemptsUsed >= 2) {
@@ -1355,7 +1354,7 @@
                   attemptId: activeAttempt.id,
                   startTime: activeAttempt.startTime,
                   elapsedMs: elapsed,
-                  timeLimitMs: 2 * 60 * 60 * 1000,
+                  timeLimitMs: (3 * 60 + 45) * 60 * 1000,
                   examMode: activeAttempt.examMode
                 });
               }
@@ -1380,7 +1379,7 @@
               attemptId: newAttempt.id,
               startTime: newAttempt.startTime,
               elapsedMs: 0,
-              timeLimitMs: 2 * 60 * 60 * 1000,
+              timeLimitMs: (3 * 60 + 45) * 60 * 1000,
               examMode: newAttempt.examMode
             });
           }
@@ -1425,7 +1424,7 @@
                 id: activeAttempt.id,
                 startTime: activeAttempt.startTime,
                 elapsedMs: Date.now() - activeAttempt.startTime,
-                timeLimitMs: 2 * 60 * 60 * 1000
+                timeLimitMs: (3 * 60 + 45) * 60 * 1000
               } : null,
               history: finishedAttempts.map(a => ({
                 id: a.id,
