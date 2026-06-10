@@ -907,9 +907,6 @@
       <button class="btn-icon" id="sound-toggle" aria-label="Alternar Sonidos" title="Alternar Sonidos">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-volume-2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
       </button>
-      <button class="btn-icon" id="theme-toggle" aria-label="Alternar Tema" title="Alternar Tema">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-moon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-      </button>
     </div>
   </header>
 
@@ -930,8 +927,7 @@
       </div>
 
       <div class="auth-actions">
-        <button class="btn" id="auth-primary-btn">Entrar al Simulador</button>
-        <span class="auth-toggle-link" id="auth-toggle-btn">¿No tienes cuenta? Regístrate gratis</span>
+        <button class="btn" id="auth-primary-btn" style="width: 100%;">Entrar al Simulador</button>
       </div>
     </div>
 
@@ -1268,17 +1264,6 @@
     let confetti = [];
     let confettiAnimationId = null;
 
-    // Theme & Sound toggles
-    themeToggle.addEventListener('click', () => {
-      const currentTheme = document.documentElement.getAttribute('data-theme');
-      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', newTheme);
-      themeToggle.innerHTML = newTheme === 'dark' 
-        ? `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-moon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`
-        : `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-sun"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
-      audio.playClick();
-    });
-
     soundToggle.addEventListener('click', () => {
       audio.enabled = !audio.enabled;
       soundToggle.style.opacity = audio.enabled ? "1" : "0.5";
@@ -1468,15 +1453,6 @@
     }
 
     // AUTH ACTIONS
-    let isRegistering = false;
-    authToggleBtn.addEventListener('click', () => {
-      isRegistering = !isRegistering;
-      authCardTitle.innerText = isRegistering ? "Registrarse Gratis" : "Iniciar Sesión";
-      authPrimaryBtn.innerText = isRegistering ? "Crear Cuenta e Ingresar" : "Entrar al Simulador";
-      authToggleBtn.innerText = isRegistering ? "¿Ya tienes cuenta? Inicia sesión" : "¿No tienes cuenta? Regístrate gratis";
-      authError.style.display = 'none';
-    });
-
     authPrimaryBtn.addEventListener('click', async () => {
       audio.playClick();
       const username = authUsernameInput.value.trim();
@@ -1488,14 +1464,8 @@
       }
 
       authError.style.display = 'none';
-      const endpoint = isRegistering ? '/api/register' : '/api/login';
 
       try {
-        if (isRegistering) {
-          await apiRequest('/api/register', 'POST', { username, password });
-          isRegistering = false; // Toggle to login
-        }
-        
         const loginData = await apiRequest('/api/login', 'POST', { username, password });
         currentUser = {
           id: loginData.userId,
