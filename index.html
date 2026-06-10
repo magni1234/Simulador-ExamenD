@@ -1232,6 +1232,16 @@
       stopConfetti();
     });
 
+    nextBtn.addEventListener('click', () => {
+      audio.playClick();
+      currentQuestionIdx++;
+      if (currentQuestionIdx < activeQuestions.length) {
+        loadQuestion(currentQuestionIdx);
+      } else {
+        finishExam();
+      }
+    });
+
     // DASHBOARD AND HISTORIC LOADER
     async function loadDashboard() {
       try {
