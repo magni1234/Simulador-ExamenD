@@ -1,7 +1,7 @@
 {
-  "name": "simulador-nombramiento-supabase",
+  "name": "simulador-nombramiento-backend",
   "version": "1.0.0",
-  "description": "Backend para el simulador de Nombramiento Docente con Supabase, control de intentos y autenticacion",
+  "description": "Backend para el simulador de Nombramiento Docente con autenticacion e intentos limitados",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
